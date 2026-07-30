@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>RISHUY - BLOC 5 - Pharmacologie avancée et calculs de doses</title>
+<style>
+  :root{
+    --rouge:#c0392b; --rouge-bg:#fdecea; --rouge-bd:#e74c3c;
+    --orange:#c46b0e; --orange-bg:#fdf0e0; --orange-bd:#f39c12;
+    --vert:#1e7e45; --vert-bg:#e9f7ef; --vert-bd:#2ecc71;
+    --bleu:#2c3e50; --bleu-bg:#eaf2f8;
+    --gris:#555;
+  }
+  body{ font-family:'Segoe UI', Arial, sans-serif; max-width:960px; margin:0 auto; padding:20px 24px 60px; color:#222; line-height:1.55; background:#fafafa; }
+  h1{ text-align:center; color:#1a1a2e; border-bottom:4px solid #1a1a2e; padding-bottom:12px; margin-bottom:6px; }
+  .sousTitre{ text-align:center; color:var(--gris); margin-bottom:30px; font-size:15px;}
+  .legende{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; background:#fff; border:1px solid #ddd; border-radius:10px; padding:14px; margin-bottom:40px; }
+  .legende span{ padding:6px 12px; border-radius:6px; font-size:13.5px; font-weight:600; }
+  .leg-rouge{background:var(--rouge-bg); color:var(--rouge); border:1px solid var(--rouge-bd);}
+  .leg-orange{background:var(--orange-bg); color:var(--orange); border:1px solid var(--orange-bd);}
+  .leg-vert{background:var(--vert-bg); color:var(--vert); border:1px solid var(--vert-bd);}
+  .sousDomaine{ background:#1a1a2e; color:#fff; text-align:center; padding:10px; border-radius:10px; margin:35px 0 20px; font-size:16px; letter-spacing:0.5px; }
+  .fiche{ background:#fff; border:1px solid #e0e0e0; border-radius:14px; padding:26px 30px; margin-bottom:45px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+  .fiche h2{ color:#1a1a2e; border-left:6px solid #1a1a2e; padding-left:12px; margin-top:0; font-size:22px; }
+  .fiche h3{ margin-top:26px; color:#1a1a2e; font-size:17px; border-bottom:2px solid #eee; padding-bottom:5px; }
+  .domaine{ display:inline-block; background:var(--bleu-bg); color:var(--bleu); padding:3px 12px; border-radius:20px; font-size:13px; font-weight:600; margin-bottom:10px; }
+  .rouge{ background:var(--rouge-bg); border-left:5px solid var(--rouge-bd); color:#5a1a13; padding:10px 14px; border-radius:6px; margin:8px 0;}
+  .orange{ background:var(--orange-bg); border-left:5px solid var(--orange-bd); color:#5a3a08; padding:10px 14px; border-radius:6px; margin:8px 0;}
+  .vert{ background:var(--vert-bg); border-left:5px solid var(--vert-bd); color:#0f4a26; padding:10px 14px; border-radius:6px; margin:8px 0;}
+  .tag{ display:inline-block; font-size:11px; font-weight:700; color:#fff; padding:2px 8px; border-radius:4px; margin-right:6px; vertical-align:middle; }
+  .tag-rouge{background:var(--rouge-bd);}
+  .tag-orange{background:var(--orange-bd);}
+  .tag-vert{background:var(--vert-bd);}
+  ul{ padding-left:22px; }
+  li{ margin-bottom:6px; }
+  table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:14.5px;}
+  th, td{ border:1px solid #ddd; padding:8px 10px; text-align:left;}
+  th{ background:#1a1a2e; color:#fff; }
+  tr:nth-child(even){ background:#f7f7f9; }
+  .heb{ direction:rtl; font-weight:600; font-size:16px; }
+  .calc{ background:#f4f0fb; border:1px dashed #8e6fc9; border-radius:8px; padding:12px 16px; margin:10px 0; font-size:14.5px; }
+  .calc b{ color:#5a3a9c; }
+  .formule{ background:#1a1a2e; color:#fff; padding:10px 16px; border-radius:8px; margin:10px 0; font-size:15px; text-align:center; font-weight:600; }
+  .finbloc{ text-align:center; background:#1a1a2e; color:#fff; padding:20px; border-radius:12px; margin-top:20px; }
+  .finbloc ul{ text-align:left; display:inline-block; }
+
+  @page{ size: A4; margin: 15mm 14mm 18mm 14mm; }
+  @media print{
+    body{ max-width:none; margin:0; padding:0; background:#fff; font-size:12.5px; line-height:1.42; }
+    h1{ break-after:avoid; page-break-after:avoid; margin-bottom:4px; }
+    .sousTitre{ break-after:avoid; page-break-after:avoid; margin-bottom:14px; }
+    .legende{ break-inside:avoid; page-break-inside:avoid; break-after:avoid; page-break-after:avoid; box-shadow:none; margin-bottom:20px; padding:10px; }
+    .legende span{ font-size:11.5px; padding:4px 8px; }
+    .sousDomaine{ break-inside:avoid; page-break-inside:avoid; break-after:avoid; page-break-after:avoid; break-before:page; page-break-before:always; }
+    .fiche{ break-inside:avoid; page-break-inside:avoid; break-before:page; page-break-before:always; box-shadow:none; border:1px solid #ccc; margin-bottom:0; padding:14px 16px; }
+    .fiche:first-of-type{ break-before:auto; page-break-before:auto; }
+    h2, h3{ break-after:avoid; page-break-after:avoid; break-inside:avoid; page-break-inside:avoid; }
+    .rouge, .orange, .vert, .calc, .formule{ break-inside:avoid; page-break-inside:avoid; }
+    ul, ol{ break-inside:avoid; page-break-inside:avoid; }
+    li{ break-inside:avoid; page-break-inside:avoid; }
+    table{ break-inside:auto; page-break-inside:auto; }
+    thead{ display:table-header-group; }
+    tr{ break-inside:avoid; page-break-inside:avoid; }
+    .finbloc{ break-inside:avoid; page-break-inside:avoid; background:#1a1a2e !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .rouge, .orange, .vert, .calc, .formule, .domaine, .tag, .legende span, th, .sousDomaine{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+    a{ color:inherit; text-decoration:none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>PRÉPARATION RISHUY (רישוי)</h1>
+<div class="sousTitre">BLOC 5 — PHARMACOLOGIE AVANCÉE ET CALCULS DE DOSES</div>
+
+<div class="legende">
+  <span class="leg-rouge">🔴 CRITIQUE — à connaître par cœur / urgence vitale / tombe systématiquement à l'examen</span>
+  <span class="leg-orange">🟠 IMPORTANT — fréquent à l'examen / points souvent confondus</span>
+  <span class="leg-vert">🟢 BON À SAVOIR — renforcement / culture professionnelle</span>
+</div>
+
+<div class="sousDomaine">SÉCURITÉ MÉDICAMENTEUSE ET MÉTHODES DE CALCUL</div>
+
+<!-- ===================== FICHE 37 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Sécurité</div>
+<h2>FICHE 37 — Règle des 5R/7R et méthodes de calcul de base</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span>
+<p><b>Règle des 7R (extension de la règle des 5R) — à réciter par cœur :</b></p>
+<ol>
+  <li><b>Bon patient</b> (Right patient) — 2 identifiants vérifiés.</li>
+  <li><b>Bon médicament</b> (Right drug) — vérifier le nom, attention aux noms proches (« look-alike / sound-alike »).</li>
+  <li><b>Bonne dose</b> (Right dose) — recalculer soi-même, ne jamais faire confiance aveuglément à la prescription.</li>
+  <li><b>Bonne voie</b> (Right route) — orale, IV, IM, SC, etc.</li>
+  <li><b>Bon moment</b> (Right time) — respecter les horaires et intervalles prescrits.</li>
+  <li><b>Bonne documentation</b> (Right documentation) — tracer immédiatement après administration, jamais avant.</li>
+  <li><b>Droit de refus du patient</b> (Right to refuse) — informer et respecter le refus éclairé.</li>
+</ol>
+</div>
+
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span>
+<p><b>3 formules de calcul fondamentales à maîtriser parfaitement :</b></p>
+<div class="formule">Dose à administrer = (Dose prescrite ÷ Dose disponible) × Volume disponible</div>
+<div class="formule">Débit de perfusion (mL/h) = Volume total (mL) ÷ Temps de perfusion (h)</div>
+<div class="formule">Débit en gouttes/min = (Volume en mL × Facteur goutte-à-goutte) ÷ (Temps en minutes)</div>
+</div>
+<p><b>Facteurs goutte-à-goutte standards :</b> tubulure macrogoutte = 20 gouttes/mL (adulte standard) ; tubulure microgoutte (pédiatrie/soins intensifs) = 60 gouttes/mL (1 goutte = 1 microgoutte = 1 mL/h directement, calcul simplifié).</p>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Toujours recalculer indépendamment une dose, même si elle a été calculée par un collègue — la double vérification n'est pas une marque de défiance mais une norme de sécurité.</li>
+  <li>Pour tout médicament à haut risque (insuline, héparine, chimiothérapies, opioïdes, électrolytes concentrés, anticoagulants) : double vérification obligatoire par un second soignant avant administration.</li>
+  <li>Ne jamais arrondir de façon approximative — utiliser les unités précises prescrites (UI, mg, mcg/µg — bien distinguer mg de mcg, erreur classique et potentiellement fatale d'un facteur 1000).</li>
+  <li>Vérifier systématiquement la concordance entre l'unité de la prescription et l'unité du produit disponible avant tout calcul.</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> Une erreur de virgule décimale ou de confusion mg/mcg peut entraîner un surdosage d'un facteur 10, 100 ou 1000 — toujours relire deux fois le calcul avant administration d'un médicament à marge thérapeutique étroite.</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple 1 (dose orale) :</b> Prescription de 750mg d'un médicament, comprimés disponibles à 250mg.<br><b>Calcul :</b> 750 ÷ 250 = <b>3 comprimés</b>.</div>
+<div class="calc"><b>Exemple 2 (débit horaire) :</b> Perfusion de 1000mL à passer en 8h.<br><b>Calcul :</b> 1000 ÷ 8 = <b>125 mL/h</b>.</div>
+<div class="calc"><b>Exemple 3 (gouttes/min, macrogoutte) :</b> 500mL à passer en 4h avec une tubulure à 20 gouttes/mL.<br><b>Calcul :</b> (500 × 20) ÷ (4 × 60) = 10000 ÷ 240 ≈ <b>42 gouttes/min</b>.</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Dose prescrite</td><td class="heb">מינון רשום</td><td>minoun rashoum</td></tr>
+<tr><td>Débit de perfusion</td><td class="heb">קצב עירוי</td><td>ketsev irouy</td></tr>
+<tr><td>Double vérification</td><td class="heb">בדיקה כפולה</td><td>bdika kfoula</td></tr>
+<tr><td>Voie d'administration</td><td class="heb">דרך מתן</td><td>derekh matan</td></tr>
+<tr><td>Médicament à haut risque</td><td class="heb">תרופה בסיכון גבוה</td><td>troufa be-sikoun gavoah</td></tr>
+<tr><td>Surdosage</td><td class="heb">מנת יתר</td><td>manat yeter</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===================== FICHE 38 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Perfusion</div>
+<h2>FICHE 38 — Solutés de perfusion : cristalloïdes et colloïdes</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<p><b>Cristalloïdes (1ère intention dans la grande majorité des situations) :</b></p>
+<table>
+<tr><th>Soluté</th><th>Composition/tonicité</th><th>Indications principales</th></tr>
+<tr><td>NaCl 0,9% (sérum physiologique)</td><td>Isotonique</td><td>Remplissage vasculaire, dilution de médicaments, réhydratation</td></tr>
+<tr><td>Ringer Lactate</td><td>Isotonique, contient électrolytes proches du plasma</td><td>Remplissage vasculaire, brûlés, chirurgie</td></tr>
+<tr><td>Glucosé 5%</td><td>Isotonique au départ (devient hypotonique après métabolisation du glucose)</td><td>Apport hydrique/calorique de base, véhicule de médicaments, hypoglycémie (glucosé plus concentré)</td></tr>
+<tr><td>NaCl hypertonique (3%, etc.)</td><td>Hypertonique</td><td>Hyponatrémie sévère symptomatique — usage encadré, risque de myélinolyse centropontine si correction trop rapide</td></tr>
+</table>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Le <b>glucosé ne doit jamais être utilisé pour un remplissage vasculaire rapide</b> (il ne reste pas dans le secteur vasculaire, à la différence du NaCl 0,9%) — erreur fréquente à l'examen.</div>
+<div class="vert"><span class="tag tag-vert">BON À SAVOIR</span> Colloïdes (albumine, gélatines) : restent plus longtemps dans le secteur vasculaire que les cristalloïdes, usage plus spécifique et encadré (choc hémorragique sévère, hypoalbuminémie), moins utilisés en 1ère intention en pratique courante actuelle.</div>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li>Vérifier systématiquement la concordance entre le soluté prescrit et celui administré (étiquetage, double vérification).</li>
+  <li>Surveiller les signes de surcharge hydrique (dyspnée, œdèmes, prise de poids rapide, crépitants) particulièrement chez le patient cardiaque/rénal — adapter le débit.</li>
+  <li>Surveillance rapprochée en cas de correction d'une hyponatrémie sévère : correction lente et progressive (généralement &lt; 8-10 mmol/L par 24h) pour éviter le risque de myélinolyse centropontine.</li>
+  <li>Ne jamais administrer de glucosé seul en cas d'hyperkaliémie sans association à l'insuline sur prescription (protocole insuline-glucose pour faire entrer le potassium dans les cellules).</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> Correction trop rapide d'une hyponatrémie chronique = risque de myélinolyse centropontine, complication neurologique grave et parfois irréversible.</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple :</b> Réhydratation de base prescrite : 2000mL de NaCl 0,9%/24h.<br><b>Calcul du débit :</b> 2000 ÷ 24 ≈ <b>83 mL/h</b>.</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Sérum physiologique</td><td class="heb">תמיסת מלח פיזיולוגית</td><td>tmisat melah fizyologit</td></tr>
+<tr><td>Soluté glucosé</td><td class="heb">תמיסת גלוקוז</td><td>tmisat glucose</td></tr>
+<tr><td>Remplissage vasculaire</td><td class="heb">מתן נוזלים</td><td>matan nozlim</td></tr>
+<tr><td>Hyponatrémie</td><td class="heb">היפונתרמיה</td><td>hiponatremia</td></tr>
+<tr><td>Surcharge hydrique</td><td class="heb">עומס נוזלים</td><td>omes nozlim</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="sousDomaine">CLASSES THÉRAPEUTIQUES À HAUT RISQUE</div>
+
+<!-- ===================== FICHE 39 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Hématologie</div>
+<h2>FICHE 39 — Anticoagulants : héparine, AVK, anticoagulants oraux directs</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<table>
+<tr><th>Classe</th><th>Exemple</th><th>Surveillance biologique</th><th>Antidote</th></tr>
+<tr><td>Héparine non fractionnée (HNF)</td><td>Héparine IV</td><td>TCA (cible généralement 1,5-2,5 fois le témoin)</td><td>Sulfate de protamine</td></tr>
+<tr><td>Héparine de bas poids moléculaire (HBPM)</td><td>Énoxaparine</td><td>Anti-Xa si besoin (surveillance non systématique sauf situations particulières : insuffisance rénale, obésité, grossesse)</td><td>Sulfate de protamine (réversion partielle)</td></tr>
+<tr><td>Antivitamines K (AVK)</td><td>Warfarine, acénocoumarol</td><td>INR (cible généralement 2-3 selon indication)</td><td>Vitamine K, CCP (concentré de complexe prothrombique) si urgence</td></tr>
+<tr><td>Anticoagulants oraux directs (AOD/NOAC)</td><td>Rivaroxaban, apixaban, dabigatran</td><td>Pas de surveillance biologique de routine</td><td>Andexanet alfa (anti-Xa), idarucizumab (dabigatran) selon disponibilité</td></tr>
+</table>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span> L'héparine et les anticoagulants en général figurent parmi les médicaments à plus haut risque d'erreur grave — <b>double vérification systématique obligatoire</b> avant toute administration.</div>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Surveillance systématique des signes hémorragiques : gencives, hématomes spontanés, sang dans les selles/urines, épistaxis, saignement prolongé au point de ponction.</li>
+  <li>Surveillance biologique adaptée selon la molécule (TCA pour l'HNF, INR pour les AVK) — communiquer les résultats à l'équipe médicale pour adaptation posologique.</li>
+  <li>Éducation du patient sous AVK : régularité du régime alimentaire (aliments riches en vitamine K — légumes verts — à consommer de façon stable, pas nécessairement à éviter), interactions médicamenteuses nombreuses, importance du suivi INR régulier, port d'une carte de traitement anticoagulant.</li>
+  <li>Vérifier l'absence de contre-indication avant tout geste invasif chez un patient anticoagulé (report d'un geste électif si besoin, relais éventuel par héparine selon protocole).</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> INR &gt; 5 sous AVK, même asymptomatique, impose une évaluation médicale — INR très élevé associé à un saignement actif = urgence (réversion en urgence par vitamine K +/- CCP).</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple :</b> Énoxaparine (HBPM) prescrite à 1mg/kg/12h pour un patient de 80kg, seringue préremplie à 100mg/mL.<br><b>Calcul de la dose :</b> 1mg × 80kg = <b>80mg</b> par injection.<br><b>Calcul du volume :</b> 80mg ÷ 100mg/mL = <b>0,8mL</b> à injecter en sous-cutané.</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Anticoagulant</td><td class="heb">נוגד קרישה</td><td>noged krisha</td></tr>
+<tr><td>Héparine</td><td class="heb">הפרין</td><td>heparin</td></tr>
+<tr><td>INR</td><td class="heb">INR / זמן פרותרומבין</td><td>INR</td></tr>
+<tr><td>Saignement</td><td class="heb">דימום</td><td>dimoum</td></tr>
+<tr><td>Vitamine K</td><td class="heb">ויטמין K</td><td>vitamin K</td></tr>
+<tr><td>Interaction médicamenteuse</td><td class="heb">אינטראקציה תרופתית</td><td>interaktsia troufatit</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===================== FICHE 40 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Antalgie</div>
+<h2>FICHE 40 — Antalgiques : paliers OMS et opioïdes</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span>
+<p><b>3 paliers antalgiques de l'OMS :</b></p>
+<table>
+<tr><th>Palier</th><th>Type</th><th>Exemples</th></tr>
+<tr><td>Palier 1</td><td>Non opioïdes</td><td>Paracétamol, AINS (ibuprofène, etc.)</td></tr>
+<tr><td>Palier 2</td><td>Opioïdes faibles</td><td>Tramadol, codéine</td></tr>
+<tr><td>Palier 3</td><td>Opioïdes forts</td><td>Morphine, fentanyl, oxycodone</td></tr>
+</table>
+</div>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span>
+<p><b>Triade de la surdose aux opioïdes (à connaître par cœur) :</b> <b>myosis</b> (pupilles punctiformes), <b>dépression respiratoire</b> (bradypnée &lt; 12/min, pouvant aller jusqu'à l'apnée), <b>troubles de la conscience</b> (somnolence à coma).</p>
+<p><b>Antidote :</b> <b>naloxone</b> — antagoniste opioïde à action rapide, à administrer en urgence en cas de dépression respiratoire sous opioïdes. Durée d'action souvent plus courte que celle de certains opioïdes → risque de re-sédation après la réversion, nécessitant une surveillance prolongée après administration.</p>
+</div>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Surveillance systématique de la fréquence respiratoire et du niveau de sédation avant et après chaque administration d'opioïde (échelle de sédation type EDS/POSS) — la sédation excessive précède toujours la dépression respiratoire, c'est le signe d'alerte le plus précoce.</li>
+  <li>Prévention et traitement des effets secondaires fréquents des opioïdes : constipation (laxatifs préventifs souvent systématiques), nausées, prurit, rétention urinaire.</li>
+  <li>Évaluation régulière et tracée de la douleur (échelles numériques ou visuelles adaptées à l'âge/aux capacités du patient).</li>
+  <li>Toujours avoir la naloxone disponible et accessible dans les services utilisant des opioïdes forts.</li>
+  <li>Éducation du patient sur l'usage correct, les risques de dépendance en cas d'usage prolongé non encadré, l'importance de ne pas associer avec de l'alcool ou d'autres dépresseurs du système nerveux central (benzodiazépines).</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> FR &lt; 8-10/min et/ou score de sédation élevé sous opioïdes = urgence, alerte immédiate, préparation de la naloxone.</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple :</b> Morphine 5mg SC prescrite, ampoule à 10mg/1mL.<br><b>Calcul :</b> 5mg ÷ 10mg/mL = <b>0,5mL</b> à injecter en sous-cutané.</div>
+<div class="calc"><b>Naloxone :</b> prescription de 0,4mg IV en cas de dépression respiratoire, ampoule à 0,4mg/1mL → <b>1mL</b> à injecter, à répéter selon la réponse clinique et le protocole (surveillance prolongée après administration en raison du risque de re-sédation).</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Antalgique</td><td class="heb">משכך כאבים</td><td>meshakekh ke'evim</td></tr>
+<tr><td>Opioïde</td><td class="heb">אופיואיד</td><td>opioid</td></tr>
+<tr><td>Morphine</td><td class="heb">מורפין</td><td>morfin</td></tr>
+<tr><td>Naloxone</td><td class="heb">נלוקסון</td><td>naloxone</td></tr>
+<tr><td>Dépression respiratoire</td><td class="heb">דיכוי נשימתי</td><td>dikouy neshimati</td></tr>
+<tr><td>Myosis (pupilles punctiformes)</td><td class="heb">מיוזיס / אישונים מכווצים</td><td>myosis</td></tr>
+<tr><td>Douleur</td><td class="heb">כאב</td><td>ke'ev</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===================== FICHE 41 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Infectiologie</div>
+<h2>FICHE 41 — Antibiotiques : grandes classes et règles de sécurité</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<table>
+<tr><th>Classe</th><th>Exemples</th><th>Point de vigilance</th></tr>
+<tr><td>Bêta-lactamines (pénicillines, céphalosporines)</td><td>Amoxicilline, ceftriaxone</td><td>Risque d'allergie croisée entre pénicillines et céphalosporines (faible mais à connaître)</td></tr>
+<tr><td>Aminosides</td><td>Gentamicine</td><td>Néphrotoxicité et ototoxicité — surveillance de la fonction rénale et dosages sanguins (pic/résiduel)</td></tr>
+<tr><td>Glycopeptides</td><td>Vancomycine</td><td>Néphrotoxicité, syndrome de l'homme rouge si perfusion trop rapide — toujours diluer et perfuser lentement</td></tr>
+<tr><td>Fluoroquinolones</td><td>Ciprofloxacine</td><td>Risque de tendinopathie/rupture tendineuse, photosensibilisation, allongement du QT</td></tr>
+</table>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Avant toute administration d'antibiotique : <b>rechercher systématiquement les allergies connues</b> du patient (interrogatoire + dossier) — question incontournable de la règle des 7R appliquée aux antibiotiques.</div>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Surveillance des 30 premières minutes après une nouvelle administration d'antibiotique (risque de réaction allergique/anaphylactique) — matériel d'urgence (adrénaline) accessible.</li>
+  <li>Respect strict des horaires prescrits pour maintenir des taux sanguins efficaces (particulièrement important pour les antibiotiques temps-dépendants).</li>
+  <li>Prélèvement des hémocultures et autres prélèvements bactériologiques <b>avant</b> la première dose d'antibiotique chaque fois que possible (sauf urgence vitale ne permettant pas ce délai).</li>
+  <li>Éducation à l'observance complète du traitement même en cas d'amélioration rapide des symptômes (prévention de l'antibiorésistance).</li>
+  <li>Surveillance spécifique selon la molécule : fonction rénale sous aminosides/vancomycine, débit de perfusion lent pour la vancomycine, allongement du QT sous fluoroquinolones chez les patients à risque.</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> Apparition d'un rash cutané généralisé, d'un œdème du visage/de la gorge, ou de difficultés respiratoires pendant/après une perfusion d'antibiotique = suspicion d'anaphylaxie → arrêt immédiat, alerte médicale, préparation de l'adrénaline.</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple :</b> Ceftriaxone 2g prescrite, reconstituée dans 100mL de NaCl 0,9%, à passer en 30 minutes.<br><b>Calcul du débit :</b> 100mL ÷ 30min × 60 = <b>200 mL/h</b>.</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Antibiotique</td><td class="heb">אנטיביוטיקה</td><td>antibiotika</td></tr>
+<tr><td>Allergie médicamenteuse</td><td class="heb">אלרגיה לתרופה</td><td>alergia le-troufa</td></tr>
+<tr><td>Réaction anaphylactique</td><td class="heb">תגובה אנפילקטית</td><td>tguva anafilaktit</td></tr>
+<tr><td>Hémoculture</td><td class="heb">תרבית דם</td><td>tarbit dam</td></tr>
+<tr><td>Résistance aux antibiotiques</td><td class="heb">עמידות לאנטיביוטיקה</td><td>amidout le-antibiotika</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===================== FICHE 42 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Électrolytes</div>
+<h2>FICHE 42 — Électrolytes à haut risque : potassium et calcium</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span>
+<p><b>Chlorure de potassium (KCl) — l'un des médicaments les plus dangereux en cas d'erreur d'administration :</b></p>
+<ul>
+  <li><b>Ne jamais administrer en bolus IV direct</b> (risque d'arrêt cardiaque immédiat par hyperkaliémie brutale).</li>
+  <li>Toujours diluer et administrer en perfusion lente, à un débit maximal encadré par le protocole institutionnel (généralement de l'ordre de 10-20 mEq/h maximum en dehors de situations exceptionnelles très encadrées avec monitorage continu).</li>
+  <li>Vérification de la fonction rénale et de la kaliémie avant toute supplémentation.</li>
+</ul>
+</div>
+<p><b>Valeurs normales de référence :</b></p>
+<table>
+<tr><th>Électrolyte</th><th>Valeur normale</th></tr>
+<tr><td>Potassium (K+)</td><td>3,5 - 5,0 mmol/L</td></tr>
+<tr><td>Calcium (Ca2+) total</td><td>2,2 - 2,6 mmol/L</td></tr>
+<tr><td>Sodium (Na+)</td><td>135 - 145 mmol/L</td></tr>
+<tr><td>Magnésium (Mg2+)</td><td>0,7 - 1,0 mmol/L</td></tr>
+</table>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Double vérification obligatoire par un second soignant avant toute administration de KCl, quelle que soit la voie.</li>
+  <li>Monitorage cardiaque continu recommandé pendant toute supplémentation potassique IV (risque de troubles du rythme).</li>
+  <li>Surveillance ECG en cas d'hyperkaliémie ou d'hypokaliémie sévère (ondes T pointues et QRS élargi en hyperkaliémie ; onde U, aplatissement de l'onde T, risque de torsades de pointes en hypokaliémie sévère).</li>
+  <li>Pour le calcium IV : ne jamais administrer dans la même voie que le bicarbonate (précipitation), surveiller le point d'injection (risque de nécrose en cas d'extravasation).</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> Toute prescription de KCl en bolus IV direct doit être considérée comme une erreur de prescription à vérifier immédiatement avant exécution — ne jamais exécuter par automatisme.</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple :</b> Supplémentation potassique prescrite : 20 mEq de KCl dans 500mL de NaCl 0,9%, à passer en 4h (respect du débit maximal sécurisé).<br><b>Calcul du débit :</b> 500mL ÷ 4h = <b>125 mL/h</b>, soit une administration de 5 mEq/h (20 mEq ÷ 4h) — à vérifier conforme au protocole institutionnel avant administration.</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Potassium</td><td class="heb">אשלגן</td><td>ashlagan</td></tr>
+<tr><td>Calcium</td><td class="heb">סידן</td><td>sidan</td></tr>
+<tr><td>Hyperkaliémie</td><td class="heb">היפרקלמיה</td><td>hiperkalemia</td></tr>
+<tr><td>Hypokaliémie</td><td class="heb">היפוקלמיה</td><td>hipokalemia</td></tr>
+<tr><td>Troubles du rythme cardiaque</td><td class="heb">הפרעות קצב לב</td><td>hafra'ot ketsev lev</td></tr>
+<tr><td>Monitorage cardiaque</td><td class="heb">ניטור לב</td><td>nitour lev</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===================== FICHE 43 ===================== -->
+<div class="fiche">
+<div class="domaine">Pharmacologie / Urgences toxicologiques</div>
+<h2>FICHE 43 — Antidotes majeurs : tableau récapitulatif</h2>
+
+<h3>2. Sélection des notions clés</h3>
+<div class="rouge"><span class="tag tag-rouge">CRITIQUE</span>
+<p><b>Tableau des antidotes essentiels à connaître par cœur pour l'examen :</b></p>
+<table>
+<tr><th>Toxique / Surdosage</th><th>Antidote</th></tr>
+<tr><td>Opioïdes (morphine, fentanyl, héroïne)</td><td>Naloxone</td></tr>
+<tr><td>Benzodiazépines</td><td>Flumazénil (usage prudent — risque de convulsions en cas de dépendance chronique)</td></tr>
+<tr><td>Paracétamol (surdosage)</td><td>N-acétylcystéine</td></tr>
+<tr><td>Antivitamines K (AVK)</td><td>Vitamine K, CCP en urgence</td></tr>
+<tr><td>Héparine non fractionnée</td><td>Sulfate de protamine</td></tr>
+<tr><td>Sulfate de magnésium (surdosage)</td><td>Gluconate de calcium</td></tr>
+<tr><td>Hyperkaliémie</td><td>Gluconate de calcium (protection myocardique) + insuline-glucose + bêta-2 mimétiques (transfert intracellulaire) ± dialyse</td></tr>
+<tr><td>Bêta-bloquants (surdosage)</td><td>Glucagon</td></tr>
+<tr><td>Fer (surdosage)</td><td>Déféroxamine</td></tr>
+<tr><td>Organophosphorés</td><td>Atropine + pralidoxime</td></tr>
+</table>
+</div>
+
+<h3>3. Rôle et surveillance infirmière</h3>
+<ul>
+  <li class="rouge"><span class="tag tag-rouge">CRITIQUE</span> Connaître l'emplacement et la disponibilité des antidotes d'urgence dans son service (chariot d'urgence, pharmacie).</li>
+  <li>Toujours associer l'administration d'un antidote à une surveillance rapprochée des paramètres vitaux et à la recherche de la cause du surdosage/de l'intoxication.</li>
+  <li>Se rappeler que certains antidotes ont une durée d'action plus courte que le toxique en cause (ex : naloxone vs opioïdes à longue durée d'action) — risque de récidive des symptômes nécessitant une surveillance prolongée.</li>
+  <li>Documenter précisément l'heure d'administration, la dose, et la réponse clinique après administration d'un antidote.</li>
+</ul>
+<div class="orange"><span class="tag tag-orange">ALERTE</span> Après administration d'un antidote à durée d'action courte pour un toxique à durée d'action longue, ne jamais relâcher la surveillance trop tôt — risque de re-sédation ou de récidive des symptômes.</div>
+
+<h3>4. Calculs de doses associés</h3>
+<div class="calc"><b>Exemple :</b> Gluconate de calcium 10% prescrit en cas d'hyperkaliémie sévère avec signes ECG, 10mL IV lente sur 5-10 minutes sous monitorage — dose standard fixe chez l'adulte, à répéter selon la persistance des signes ECG et selon prescription/protocole.</div>
+
+<h3>5. Lexique médical français / hébreu</h3>
+<table>
+<thead><tr><th>Français</th><th>Hébreu</th><th>Phonétique</th></tr></thead>
+<tbody>
+<tr><td>Antidote</td><td class="heb">אנטידוט / תרופת נגד</td><td>antidote / troufat neged</td></tr>
+<tr><td>Intoxication</td><td class="heb">הרעלה</td><td>har'ala</td></tr>
+<tr><td>Surdosage</td><td class="heb">מנת יתר</td><td>manat yeter</td></tr>
+<tr><td>Toxique</td><td class="heb">רעל / חומר רעיל</td><td>ra'al / homer ra'il</td></tr>
+<tr><td>Chariot d'urgence</td><td class="heb">עגלת החייאה</td><td>agalat hah'aya</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="finbloc">
+<p><b>FIN DU BLOC 5 COMPLET (fiches 37 à 43) : Sécurité médicamenteuse, Solutés, Anticoagulants, Antalgiques, Antibiotiques, Électrolytes, Antidotes</b></p>
+<p><b>PROGRAMME COMPLET DE LA RISHUY TERMINÉ — 43 fiches au total couvrant les 5 blocs officiels :</b></p>
+<ul>
+  <li>BLOC 1 (5 fiches) : Fondements et Législation</li>
+  <li>BLOC 2 (13 fiches) : Médecine et Chirurgie</li>
+  <li>BLOC 3 (11 fiches) : Mère, Enfant et Famille</li>
+  <li>BLOC 4 (7 fiches) : Santé mentale et Psychiatrie</li>
+  <li>BLOC 5 (7 fiches) : Pharmacologie avancée et calculs de doses</li>
+</ul>
+</div>
+
+</body>
+</html>

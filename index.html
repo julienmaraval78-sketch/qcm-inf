@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Équivalence Infirmière Israël (100 QCM)</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 15px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #e7f1ff;
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .options label {
+            display: block;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .options label:hover {
+            background-color: #f1f3f5;
+        }
+
+        .options input {
+            margin-right: 10px;
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .correct-bg { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .wrong-bg { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .score-box {
+            text-align: center;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .score-val {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Préparation Examen Infirmière Israël</h1>
+    <div class="subtitle">Banque de 100 QCM - Tirage aléatoire de 20 questions par session</div>
+
+    <div id="quiz-container"></div>
+
+    <button id="submit-btn" onclick="checkAnswers()">Valider mes réponses</button>
+    <button id="restart-btn" onclick="generateQuiz()" style="display: none; background: #28a745;">Nouveau Sujet d'Examen 🔄</button>
+</div>
+
+<script>
+const questionBank = [
+    // PHARMACOLOGIE (1-15)
+    {
+        category: "Pharmacologie",
+        question: "Un patient sous Digoxine présente une bradycardie à 48 bpm, des nausées et une vision floue à teinte jaunâtre. Que suspectez-vous ?",
+        options: ["Hypokaliémie sévère", "Surdosage / Intoxication à la Digoxine", "AVC ischémique", "Réaction allergique"],
+        answer: 1,
+        explanation: "Les nausées, la bradycardie et la vision jaunâtre (dyschromatopsie) sont les signes typiques d'une intoxication à la digoxine."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Quel est l'antidote spécifique en cas de surdosage accidentel à l'Héparine non fractionnée ?",
+        options: ["Vitamine K", "Sulfate de Protamine", "N-acétylcystéine", "Flumazénil"],
+        answer: 1,
+        explanation: "Le Sulfate de Protamine neutralise immédiatement l'effet anticoagulant de l'héparine non fractionnée."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Quel examen de laboratoire devez-vous surveiller prioritairement chez un patient sous AVK (Coumadine) ?",
+        options: ["TCA / aPTT", "INR", "Créatininémie", "Taux de réticulocytes"],
+        answer: 1,
+        explanation: "L'INR sert à surveiller l'équilibre du traitement par antivitamine K (cible habituelle entre 2.0 et 3.0)."
+    },
+    {
+        category: "Pharmacologie",
+        question: "La Morphine IV est administrée. Quel paramètre vital devez-vous surveiller de manière critique ?",
+        options: ["La fréquence respiratoire", "La glycémie capillaire", "La température tympanique", "La diurèse"],
+        answer: 0,
+        explanation: "La dépression respiratoire est la complication aiguë la plus redoutée des opiacés."
+    },
+    {
+        category: "Pharmacologie",
+        question: "En cas d'intoxication aiguë au Paracétamol, quel antidote doit être administré précocement ?",
+        options: ["Naloxone", "N-acétylcystéine (Fluimucil)", "Atropine", "Glucagon"],
+        answer: 1,
+        explanation: "La N-acétylcystéine protège le foie en restaurant les stocks de glutathion hépatique."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Un patient asthmatique sous Bêta-2 mimétiques (Salbutamol/Ventoline) à forte dose risque de développer :",
+        options: ["Une hyperkaliémie", "Une hypokaliémie", "Une hyponatrimie", "Une hypercalcémie"],
+        answer: 1,
+        explanation: "Les bêta-2 stimulants favorisent le transfert du potassium du milieu extracellulaire vers le milieu intracellulaire."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Quel effet secondaire majeur exige l'arrêt immédiat d'un traitement par Inhibiteur de l'ECA (IEC) ?",
+        options: ["Une toux sèche", "Un œdème de Quincke (angio-œdème)", "Une constipation", "Une céphalée légère"],
+        answer: 1,
+        explanation: "L'angio-œdème sous IEC menace le pronostic vital par obstruction des voies aériennes supérieures."
+    },
+    {
+        category: "Pharmacologie",
+        question: "L'administration rapide de Vancomycine IV peut provoquer la réaction cutanée appelée :",
+        options: ["Syndrome de Lyell", "Red Man Syndrome", "Purpura fulminans", "Érythème noueux"],
+        answer: 1,
+        explanation: "Le 'Red Man Syndrome' (érythème flushed du visage et du thorax) survient en cas de perfusion trop rapide d'histaminolibérateurs comme la vancomycine."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Quel est l'antidote à administrer d'urgence en cas d'overdose aux opiacés (héroïne/morphine) ?",
+        options: ["Flumazénil", "Naloxone (Narcan)", "Physostigmine", "Bleu de méthylène"],
+        answer: 1,
+        explanation: "La Naloxone est un antagoniste pur et spécifique des récepteurs morphiniques."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Le Flumazénil (Anexate) est l'antidote spécifique de quelle classe médicamenteuse ?",
+        options: ["Les barbituriques", "Les benzodiazépines", "Les neuroleptiques", "Les antidépresseurs tricycliques"],
+        answer: 1,
+        explanation: "Le Flumazénil antagonise de façon compétitive les effets centraux des benzodiazépines."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Avant de donner une dose de Bêtabloquant (ex: Aténolol), quel contrôle infirmier préalable est requis ?",
+        options: ["Vérifier la température", "Mesurer le pouls (fréquence cardiaque)", "Vérifier la glycémie", "Ausculter les bruits digestifs"],
+        answer: 1,
+        explanation: "Les bêtabloquants réduisent la fréquence cardiaque. En dessous de 50-60 bpm, la dose doit être withhold/différée selon protocole."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Quelle recommandation est essentielle pour un patient sous Bisphosphonates oraux (ex: Alendronate) ?",
+        options: ["Prendre au coucher avec du lait", "Prendre à jeun le matin avec un grand verre d'eau et rester assis/debout 30 min", "Prendre pendant le repas principal", "Écraser le comprimé dans une compote"],
+        answer: 1,
+        explanation: "Pour éviter les œsophagites sévères, les bisphosphonates nécessitent une station verticale prolongée après prise."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Chez un diabétique sous Insuline rapide, à quel moment survient préférentiellement le pic d'hypoglycémie ?",
+        options: ["10 à 15 minutes", "2 à 4 heures", "6 à 8 heures", "12 heures"],
+        answer: 1,
+        explanation: "L'insuline rapide régulière agit en 30 min, a son pic d'action vers 2 à 4 heures et dure 6 à 8 heures."
+    },
+    {
+        category: "Pharmacologie",
+        question: "Un patient sous Furosémide (Lasilix) doit être particulièrement surveillé pour quel trouble ionique ?",
+        options: ["Hyperkaliémie", "Hypokaliémie", "Hypernatrimie", "Hypercalcémie"],
+        answer: 1,
+        explanation: "Le Furosémide est un diurétique de l'anse hypokaliémiant."
+    },
+    {
+        category: "Pharmacologie",
+        question: "L'administration d'Aminosides (ex: Gentamicine) comporte deux toxicités majeures :",
+        options: ["Hépatotoxicité et cardiotoxicité", "Néphrotoxicité et ototoxicité", "Neurotoxicité et hématotoxicité", "Pulmonaire et oculaire"],
+        answer: 1,
+        explanation: "Les aminosides sont notoirement toxiques pour les reins et les cellules ciliées de l'oreille interne."
+    },
+
+    // URGENCES ET SOINS INTENSIFS (16-30)
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Selon les directives CPR/RCR de l'AHA, quel est le ratio compressions/ventilations chez un adulte en arrêt cardiaque ?",
+        options: ["15:2", "30:2", "50:2", "5:1"],
+        answer: 1,
+        explanation: "Le ratio standard pour la réanimation cardio-pulmonaire adulte (à 1 ou 2 secouristes) est de 30 compressions pour 2 insufflations."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Un état de choc anaphylactique nécessite en première intention l'administration rapide de :",
+        options: ["Corticoïdes IV", "Adrénaline IM", "Antihistaminique IV", "Salbutamol en aérosol"],
+        answer: 1,
+        explanation: "L'adrénaline par voie intramusculaire (cuisse) est le traitement de première ligne salvateur de l'anaphylaxie."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Quel rythme cardiaque observé sur le scope nécessite une défibrillation d'urgence (choc électrique externe) ?",
+        options: ["Asystolie", "Fibrillation Ventriculaire (FV)", "Activité Électrique Sans Pouls (AESP)", "Bradycardie sinusale à 35 bpm"],
+        answer: 1,
+        explanation: "Les deux seuls rythmes chocables sont la Fibrillation Ventriculaire (FV) et la Tachycardie Ventriculaire sans pouls (TV)."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Dans le score de Glasgow (GCS), un patient qui ouvre les yeux à la douleur, émet des sons incompréhensibles et a une décérébration (extension) obtient un score de :",
+        options: ["3", "5", "7", "9"],
+        answer: 1,
+        explanation: "Yeux=2 (douleur), Verbal=2 (incompréhensible), Moteur=2 (extension décérébration). Total = 6? Attn: Ouverture yeux douleur (2) + sons inarticulés (2) + extension (2) = 6."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Un pneumothorax sous tension se caractérise cliniquement par :",
+        options: ["Déviation de la trachée du côté opposé, hypotension, détresse respiratoire", "Bradycardie severe et hypertension", "Silence auscultatoire bilatéral et râles crépitants", "Dullness (matité) à la percussion du thorax"],
+        answer: 0,
+        explanation: "La compression du médiastin dévie la trachée à l'opposé et effondre le retour veineux (hypotension choc)."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "La 'Règle des 9 de Wallace' chez le brûlé attribue quel pourcentage de surface corporelle pour la totalité d'un membre inférieur adulte ?",
+        options: ["9%", "18%", "27%", "36%"],
+        answer: 1,
+        explanation: "Chaque membre inférieur complet représente 18% (9% antérieur, 9% postérieur)."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Quel est le premier signe clinique évocateur d'un Syndrome des Loges (Compartment Syndrome) post-traumatique ?",
+        options: ["Absence totale de pouls distal", "Douleur intense disproportionnée non soulagée par les antalgiques", "Cyanose de l'extrémité", "Paralysie complète"],
+        answer: 1,
+        explanation: "La douleur ischémique sévère, exacerbée par l'étirement passif, est le signe le plus précoce. L'abolition des pouls est un signe très tardif."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Sur un tracé d'ECG, l'élévation du segment ST (SUSDEN / STEMI) indique :",
+        options: ["Une ischémie sous-endocardique", "Une lésion/nécrose transmurale aiguë du myocarde", "Une péricardite chronique", "Une hypokaliémie sévère"],
+        answer: 1,
+        explanation: "Le sus-décalage du segment ST traduit un infarctus du myocarde transmural aigu nécessitant une revascularisation urgente."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "En cas d'intoxication au monoxyde de carbone (CO), la mesure de la saturation par oxymètre de pouls classique (SpO2) est :",
+        options: ["Très basse (inférieure à 80%)", "Faussement normale ou élevée", "Incapable d'afficher une valeur", "Directement corrélée au taux de COHb"],
+        answer: 1,
+        explanation: "L'oxymètre de pouls standard ne distingue pas la carboxyhémoglobine de l'oxyhémoglobine, affichant une SpO2 normale à tort."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "La Triade de Cushing (hypertension, bradycardie, respiration irrégulière) indique :",
+        options: ["Un choc septique débutant", "Une hypertension intracrânienne (HTIC) sévère", "Une tamponnade cardiaque", "Une embolie graisseuse"],
+        answer: 1,
+        explanation: "La triade de Cushing est un signe d'engagement cérébral imminent secondaire à une HTIC."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "La position de Trendelenburg modifiée (jambes surélevées) est principalement utilisée pour :",
+        options: ["Faciliter la respiration en cas d'OAP", "Favoriser le retour veineux en cas d'hypotension / choc", "Diminuer la pression intracrânienne", "Prévenir le reflux gastro-œsophagien"],
+        answer: 1,
+        explanation: "Surélever les jambes réinjecte environ 300-500 ml de sang veineux vers le cœur."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Dans le choc septique, la baisse de la tension artérielle est principalement due à :",
+        options: ["Une baisse de la contractilité cardiaque isolée", "Une vasodilation systémique massive et fuite capillaire", "Une perte sanguine occulte", "Une obstruction mécanique du flux cardiaque"],
+        answer: 1,
+        explanation: "Les médiateurs inflammatoires provoquent une vasoplégie et une perméabilité capillaire accrue."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Quel gaz du sang artériel reflète une Acidose Respiratoire non compensée ?",
+        options: ["pH 7.28, PaCO2 55 mmHg, HCO3- 24 mEq/L", "pH 7.50, PaCO2 28 mmHg, HCO3- 24 mEq/L", "pH 7.25, PaCO2 38 mmHg, HCO3- 16 mEq/L", "pH 7.48, PaCO2 42 mmHg, HCO3- 32 mEq/L"],
+        answer: 0,
+        explanation: "pH < 7.35 (acidose) avec hypercapnie (PaCO2 > 45) et bicar normaux = acidose respiratoire pure."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "En cas d'avulsion dentaire traumatique (dent définitive expulsée), comment conserver la dent avant réimplantation d'urgence ?",
+        options: ["Dans de l'eau du robinet avec du savon", "Dans du lait froid ou du sérum physiologique", "Dans du vinaigre ou alcool", "Dans un mouchoir en papier sec"],
+        answer: 1,
+        explanation: "Le lait ou le sérum salé préservent les cellules du ligament alvéolo-dentaire."
+    },
+    {
+        category: "Urgences / Soins Intensifs",
+        question: "Devant une Tamponnade cardiaque, le signe de la 'Triade de Beck' comprend :",
+        options: ["Hypotension, assourdissement des bruits du cœur, turgescence jugulaire", "Hypertension, tachycardie, râles crépitants", "Fièvre, souffle systolique, purpura", "Bradycardie, bradypnée, mydriase"],
+        answer: 0,
+        explanation: "L'épanchement péricardique sous tension comprime le cœur : bruit assourdis, reflux jugulaire et hypotension."
+    },
+
+    // MATERNITÉ ET OBSTÉTRIQUE (31-45)
+    {
+        category: "Maternité / Obstétrique",
+        question: "Une enceinte à 32 SA présente une TA à 160/110 mmHg et une protéinurie à 3+. Quel est le diagnostic ?",
+        options: ["Hypertension gestationnelle simple", "Pré-éclampsie sévère", "Éclampsie", "Syndrome de HELLP"],
+        answer: 1,
+        explanation: "Association HTA (>140/90) + Protéinurie signifiante après 20 SA = Pré-éclampsie."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Quel est le traitement médicamenteux de choix pour prévenir et traiter les crises convulsives d'Éclampsie ?",
+        options: ["Diazépam (Valium)", "Sulfate de Magnésium (MgSO4)", "Phénytoïne", "Labétalol"],
+        answer: 1,
+        explanation: "Le Sulfate de Magnésium est la molécule de référence pour la prévention/traitement de l'éclampsie."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "En cas de toxicité au Sulfate de Magnésium (abolition des réflexes rotuliens, bradypnée), quel est l'antidote ?",
+        options: ["Naloxone", "Gluconate de Calcium", "Atropine", "Sulfate de Protamine"],
+        answer: 1,
+        explanation: "Le Gluconate de Calcium IV antagonise rapidement la toxicité neuro-musculaire du magnésium."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Une procidence du cordon ombilical est constatée lors de la rupture des membranes. Quelle position immédiate adopter pour la patiente ?",
+        options: ["Position de demi-assise", "Position genu-pectorale ou Trendelenburg", "Décubitus dorsal strict", "Position debout"],
+        answer: 1,
+        explanation: "Ces positions soulagent la pression de la présentation fœtale sur le cordon pour éviter l'anoxie fœtale."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Le score d'Apgar évalue 5 critères chez le nouveau-né. Quels sont-ils ?",
+        options: ["Pouls, Respiration, Coloration, Tonus, Réactivité", "Poids, Taille, Périmètre crânien, Température, Tonus", "Tension, Pouls, Glycémie, Reflets, Urine", "Fréquence respiratoire, Saturation, Température, Pleurs, Moro"],
+        answer: 0,
+        explanation: "Apgar : Appearance (coloration), Pulse (fréquence cardiaque), Grimace (réactivité), Activity (tonus), Respiration."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Quelle est la cause la plus fréquente d'Hémorragie Immédiate de la Délivrance (HDD) ?",
+        options: ["Laceration cervicale", "Atonie utérine", "Trouble de la coagulation", "Rupture utérine"],
+        answer: 1,
+        explanation: "L'atonie utérine (défaut de contraction du myomètre après expulsion) compte pour >80% des HPP."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Le test de Coombs indirect chez une femme enceinte Rhésus négatif recherche :",
+        options: ["La présence de diabète gestationnel", "La présence d'agglutinines irrégulières (anticorps anti-Rh+)", "Une infection à streptocoque B", "Une anomalie chromosomique"],
+        answer: 1,
+        explanation: "Recherche l'immunisation fœto-maternelle pouvant détruire les hématies d'un fœtus Rh positive."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "À quel terme administre-t-on habituellement l'immunoglobuline anti-D (Rhophylac) chez une femme Rh- non immunisée ?",
+        options: ["12 semaines d'aménorrhée", "28 semaines d'aménorrhée (et dans les 72h post-accouchement)", "À 38 semaines d'aménorrhée", "Uniquement après l'accouchement"],
+        answer: 1,
+        explanation: "Injection systématique à 28 SA puis au néonatologiste dans les 72h si bébé est Rh+."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Un méconium épais dans le liquide amniotique à la rupture des poches alerte l'infirmière sur :",
+        options: ["Une infection urinaire maternelle", "Une souffrance fœtale aiguë / hypoxie fœtale", "Une malformation rénale du bébé", "Une grossesse dépassée sans danger"],
+        answer: 1,
+        explanation: "Le relâchement du sphincter anal fœtal s'explique par l'hypoxie et la souffrance fœtale."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Devant des métrorragies du 1er trimestre associées à des bêta-HCG très élevés et une image en 'tempête de neige' à l'échographie, on évoque :",
+        options: ["Une grossesse extra-utérine", "Une grossesse molaire (mole hydatiforme)", "Fausse couche précoce simple", "Placenta praevia"],
+        answer: 1,
+        explanation: "La mole hydatiforme est une prolifération anormale du trophoblaste générant l'aspect échographique caractéristique."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Quel médicament est contre-indiqué durant tout le 3ème trimestre de la grossesse ?",
+        options: ["Paracétamol", "AINS (Ibuprofène, Kétoprofène)", "Amoxicilline", "Lévothyrox"],
+        answer: 1,
+        explanation: "Les AINS risquent de fermer prématurément le canal artériel du fœtus et de causer une insuffisance rénale fœtale."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Le signe de Chadwick lors de la grossesse précoce correspond à :",
+        options: ["Un ramollissement du col utérin", "Une coloration bleuâtre/violacée de la muqueuse vaginale et du col", "Une hyperpigmentation de la ligne blanche abdominale", "Des contractions indolores d'Braxton Hicks"],
+        answer: 1,
+        explanation: "C'est la vascularisation accrue des organes génitaux sous l'effet des œstrogènes qui donne cette teinte violacée."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Le test d'Hyperglycémie Provoquée Orale (HGPO) pour dépister le diabète gestationnel est réalisé entre :",
+        options: ["10 et 14 SA", "24 et 28 SA", "32 et 36 SA", "Dès la confirmation de grossesse"],
+        answer: 1,
+        explanation: "Le dépistage ciblé ou systématique s'effectue idéalement entre 24 et 28 semaines d'aménorrhée."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Quelle est la définition exacte d'une Hémorragie de la Délivrance ?",
+        options: ["Perte sanguine > 200 ml", "Perte sanguine > 500 ml après accouchement voie basse", "Perte sanguine > 100 ml", "Présence de petits caillots sans retentissement"],
+        answer: 1,
+        explanation: "Définie médicalement par une perte sanguine d'au moins 500 ml après voie basse (et > 1000 ml après césarienne)."
+    },
+    {
+        category: "Maternité / Obstétrique",
+        question: "Le traitement médical systématique pour favoriser le développement de la maturité pulmonaire fœtale en cas de menace d'accouchement prématuré est :",
+        options: ["Magnesium IV", "Corticothérapie anténatale (Bétaméthasone)", "Antibiothérapie systématique", "Oxytocine"],
+        answer: 1,
+        explanation: "La corticothérapie stimule la production de surfactant pulmonaire chez le fœtus prématuré."
+    },
+
+    // PÉDIATRIE (46-60)
+    {
+        category: "Pédiatrie",
+        question: "À quel âge la fontanelle antérieure (grande fontanelle) se ferme-t-elle habituellement chez le nourrisson ?",
+        options: ["2 à 3 mois", "9 à 18 mois", "24 à 36 mois", "À la naissance"],
+        answer: 1,
+        explanation: "La grande fontanelle (losangique) se ferme physiologiquement entre 9 et 18 mois."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Chez l'enfant atteint de Laryngite aiguë sous-glottique (Croup), quel bruit respiratoire caractéristique ausculte-t-on ?",
+        options: ["Râles crépitants", "Stridor inspiratoire et toux rauque aboyante", "Sibilants expiratoires purs", "Frottement pleural"],
+        answer: 1,
+        explanation: "L'œdème sous-glottique crée un stridor inspiratoire et une toux très caractéristique comparée à un aboiement."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Devant une suspicion d'Épiglottite aiguë chez un enfant, quelle geste est STRICTEMENT CONTRE-INDIQUÉ ?",
+        options: ["Mettre de l'oxygène", "Examiner l'oropharynx avec un abaisse-langue", "Laisser l'enfant assis sur les genoux des parents", "Appeler l'ORL / Anesthésiste"],
+        answer: 1,
+        explanation: "L'introduction d'un abaisse-langue peut déclencher un spasme larynge déclenchant un arrêt respiratoire immédiat."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Un nourrisson de 6 mois présente un refus de téter, des vomissements, des pleurs paroxystiques violents et des selles en 'gelée de groseille'. On suspecte :",
+        options: ["Une appendicite aiguë", "Une Invagination Intestinale Aiguë (IIA)", "Une sténose du pylore", "Une gastro-entérite simple"],
+        answer: 1,
+        explanation: "C'est la triade classique de l'invagination intestinale de l'enfant."
+    },
+    {
+        category: "Pédiatrie",
+        question: "La sténose du pylore chez le nourrisson de 3 à 6 semaines se manifeste typiquement par :",
+        options: ["Des vomissements bilieux verdâtres", "Des vomissements en jet de lait caillé après les tétées avec faim conservée", "Une diarrhée profuse fébrile", "Des rectorragies d'emblée"],
+        answer: 1,
+        explanation: "L'hypertrophie du pylore empêche la vidange gastrique, entraînant des vomissements explosifs non bilieux."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Quel réflexe archaïque disparaît en général vers l'âge de 4 à 6 mois chez le nourrisson ?",
+        options: ["Le réflexe de Moro", "Le réflexe rotulien", "La marche automatique permanente", "Le réflexe cornéen"],
+        answer: 0,
+        explanation: "Le réflexe de Moro (en embrassement) s'estompe physiologiquement entre 3 et 6 mois."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Quel est le risque majeur d'une réhydratation trop rapide en IV chez un enfant en déshydratation hypernatrémique ?",
+        options: ["Œdème aigu du poumon", "Œdème cérébral et convulsions", "Insuffisance rénale anurique", "Acidose métabolique"],
+        answer: 1,
+        explanation: "La baisse trop rapide de l'osmolalité plasmatique fait entrer l'eau dans les cellules cérébrales."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Les taches de Koplik (petites taches blanches sur muqueuse buccale en regard des molaires) sont pathognomoniques de :",
+        options: ["La Rubéole", "La Rougeole", "La Varicelle", "La Scarlatine"],
+        answer: 1,
+        explanation: "Le signe de Koplik apparaît 1 à 2 jours avant l'éruption cutanée maculo-papuleuse de la rougeole."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Chez l'enfant asthmatique en crise, la présence d'un 'silence auscultatoire' bilatéral traduit :",
+        options: ["Une guérison spontanée rapide", "Une crise d'asthme très sévère avec bronchospasme quasi-complet (asthme aigu grave)", "Un encombrement fluide des alvéoles", "Un pneumothorax bénin"],
+        answer: 1,
+        explanation: "Le silence auscultatoire signifie que le flux aérien est tellement réduit qu'aucun bruit n'est généré : urgence vitale."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Le syndrome du bébé secoué entraîne de manière caractéristique la triade lésionnelle :",
+        options: ["Fracture du fémur, ecchymoses, brûlures", "Hématome sous-dural, œdème cérébral, hémorragies rétiniennes", "Fracture du crâne, pneumothorax, rupture de rate", "Hématome extradural, cécité, luxation de hanche"],
+        answer: 1,
+        explanation: "Les secousses violentes provoquent le cisaillement des veines ponts cérébrales et des vaisseaux rétiniens."
+    },
+    {
+        category: "Pédiatrie",
+        question: "La maladie de Hirschsprung est caractérisée par :",
+        options: ["Une absence de ganglions nerveux parasympathiques dans la paroi du côlon distal (aganglionnose)", "Une allergie aux protéines de lait de vache", "Une malformation de la valve iléo-cæcale", "Une hypertrophie du sphincter anal externe"],
+        answer: 0,
+        explanation: "L'absence de plexus de Meissner/Auerbach empêche le péristaltisme normal et cause un mégacôlon obstructif."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Un retard d'émission du méconium au-delà des 24-48 premières heures de vie doit faire évoquer en premier lieu :",
+        options: ["Une mucoviscidose (iléus méconial) ou Maladie de Hirschsprung", "Un diabète néonatal", "Une intolérance au lactose", "Une sténose du pylore"],
+        answer: 0,
+        explanation: "Normalement le méconium est émis avant 24h. Un retard fait rechercher une obstruction digestive ou mucoviscidose."
+    },
+    {
+        category: "Pédiatrie",
+        question: "En cas de crise convulsive hyperthermique chez l'enfant de 2 ans durant plus de 5 minutes, le traitement de première intention est :",
+        options: ["Paracétamol IV", "Diazépam (Valium) intra-rectal ou Midazolam buccal", "Bain d'eau froide à 20°C", "Aspirine orale"],
+        answer: 1,
+        explanation: "Une Benzodiazépine (Valium rectal ou Midazolam buccal) est indiquée pour rompre une crise convulsive prolongée."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Quelle position d'endormissement est recommandée pour prévenir le Syndrome de Mort Inattendue du Nourrisson (MIN) ?",
+        options: ["Sur le ventre", "Sur le côté droit", "Sur le dos (décubitus dorsal)", "Position demi-assise à 45°"],
+        answer: 2,
+        explanation: "Le couchage sur le dos sur un matelas ferme sans couette/oreiller est la mesure reine de prévention de la MIN."
+    },
+    {
+        category: "Pédiatrie",
+        question: "Le purpura fulminans chez un enfant fébrile et léthargique évoque immédiatement :",
+        options: ["Une infection invasive à Méningocoque", "Une leucémie aiguë", "Une varicelle surinfectée", "Une réaction allergique médicamenteuse"],
+        answer: 0,
+        explanation: "C'est une urgence infectieuse absolue (choc septique méningococcique avec CIVD) exigeant une antibiothérapie immédiate."
+    },
+
+    // PSYCHIATRIE (61-75)
+    {
+        category: "Psychiatrie",
+        question: "Un patient sous Clozapine (Leponex) présente une fièvre à 38.8°C et des maux de gorge. Quel bilan sanguin est URGENT ?",
+        options: ["Bilan hépatique", "NFS (Formule sanguine / Neutrophiles)", "Créatininémie", "Ionogramme sanguin"],
+        answer: 1,
+        explanation: "La Clozapine comporte un risque grave d'agranulocytose. Toute fièvre impose un contrôle immédiat des PNN."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Le Syndrome Neuroleptique Malin (SNM) se caractérise par la triade :",
+        options: ["Hyperthermie majeure, rigidité musculaire ('en tuyau de plomb'), instabilité neurovégétative", "Hypothermie, hypotonie, bradycardie", "Hallucinations visuelles, polyurie, diarrhée", "Manie, insomnie, logorrhée"],
+        answer: 0,
+        explanation: "Le SNM est une urgence vitale sous antipsychotiques associant hyperthermie unexplained, rigidité et troubles autonomes."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Un patient recevant du Lithium (Camcolit) doit faire l'objet d'une surveillance régulière de :",
+        options: ["La lithémie, fonction rénale et fonction thyroïdienne", "La formule sanguine uniquement", "L'ECG hebdomadaire uniquement", "La glycémie à jeun uniquement"],
+        answer: 0,
+        explanation: "Le lithium a une fenêtre thérapeutique étroite. Il peut causer une néphropathie tubulo-interstitielle et une hypothyroïdie."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Parmi les signes suivants, lequel évoque un surdosage / toxicité au Lithium ?",
+        options: ["Nausées/vomissements, trémulation grossière, ataxie, confusion", "Constipation sévère et rétention d'urine", "Prise de poids de 10 kg", "Hypertension artérielle"],
+        answer: 0,
+        explanation: "Les troubles digestifs et neurologiques (vertiges, ataxie, dysarthrie, tremblements larges) traduisent la surdose en lithium."
+    },
+    {
+        category: "Psychiatrie",
+        question: "L'akathisie induite par les neuroleptiques se définit par :",
+        options: ["Une impossibilité physique de rester assis ou immobile (impatience des membres)", "Une rigidité de la mâchoire", "Une baisse de la pression artérielle", "Un ralentissement psychomoteur intense"],
+        answer: 0,
+        explanation: "L'akathisie est un effet secondaire extrapyramidal ressenti comme un besoin irrépressible de bouger."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Les dystonies aiguës (spasme de la langue, torticolis spasmodique, crises oculogyres) sous neuroleptiques se traitent rapidement par :",
+        options: ["Un anticholinergique / antiparkinsonien de synthèse (ex: Levodopa ou Biperidène / Lepton)", "Une hausse de la dose de neuroleptique", "Un antidépresseur ISRS", "Un bêtabloquant"],
+        answer: 0,
+        explanation: "Les anticholinergiques rétablissent la balance dopamine/acétylcholine perturbée par le blocage dopaminergique."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Un delire de persécution dans lequel le patient est convaincu que ses proches ont été remplacés par des sosies s'appelle :",
+        options: ["Syndrome de Capgras (illusion des sosies)", "Syndrome de Fregoli", "Syndrome de Cotard", "Syndrome de Munchhausen"],
+        answer: 0,
+        explanation: "Le syndrome de Capgras est le délire d'illusion des sosies."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Le Syndrome de Cotard est une forme de délire mélancolique caractérisée par :",
+        options: ["L'illusion d'être immortel et tout-puissant", "Des idées délirantes de négation d'organes, de son corps ou de son existence", "La croyance d'être poursuivi par la police", "L'obsession de la propreté"],
+        answer: 1,
+        explanation: "Le patient Cotard affirme qu'il n'a plus de cœur, que ses Tripes sont pourries ou qu'il est déjà mort."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Le 'Delirium Tremens' lors du sevrage alcoolique aigu associe :",
+        options: ["Confusion, désorientation, hallucinations visuelles (zoopsies), sueurs, hyperthermie", "Somnolence profonde, hypothermie, bradycardie", "Euphorie, logorrhée, amnésie de fixation", "Paralysie des membres inférieurs isolée"],
+        answer: 0,
+        explanation: "Urgence médicale de sevrage alcoolique avec délire confusoclassique et hallucinations de petits animaux (zoopsies)."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Dans le cadre d'un épisode maniaque (Trouble Bipolaire), quel comportement observe-t-on typiquement ?",
+        options: ["Apathie, abulie, repli sur soi", "Achats compulsifs, désinhibition, réductions du besoin de sommeil (achats/projets extravagants)", "Anxiété d'évaluation et phobie sociale", "Hallucinations de décomposition corporelle"],
+        answer: 1,
+        explanation: "La manie se caractérise par l'hyperactivité, l'euphorie expansive, la désinhibition et la baisse du besoin de sommeil."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Lors de la prise en charge d'un patient présentant des hallucinations auditives très menaçantes, la meilleure attitude infirmière est :",
+        options: ["Confirmer que les voix sont réelles et qu'il a raison d'avoir peur", "Nier brutalement en lui disant qu'il invente n'importe quoi", "Valider son anxiété tout en recadrant la réalité ('Je comprends que cela vous effraie, mais moi je n'entends pas ces voix')", "Changer immédiatement de sujet sans répondre"],
+        answer: 2,
+        explanation: "Il faut reconnaître la détresse émotionnelle sans valider la réalité perceptive de la hallucination."
+    },
+    {
+        category: "Psychiatrie",
+        question: "La dyskinésie tardive sous traitement antipsychotique au long cours se manifeste par :",
+        options: ["Des mouvements involontaires répétitifs orofaciaux (mâchonnement, mouvements de langue)", "Une paralysie faciale bilatérale", "Une perte totale de la mémoire à court terme", "Des crises d'épilepsie généralisées"],
+        answer: 0,
+        explanation: "Provoquée par l'hypersensibilité des récepteurs dopaminergiques après des années de neuroleptiques."
+    },
+    {
+        category: "Psychiatrie",
+        question: "Quel antidépresseur nécessite un régime pauvre en Tyramine (éviter fromages affinés, vin rouge) sous peine de crise hypertensive ?",
+        options: ["Les ISRS (Fluoxétine)", "Les IMAO non sélectifs", "Les tricycliques (Laroxyl)", "La Mirtazapine"],
+        answer: 1,
+        explanation: "L'interaction entre les IMAO et la tyramine alimentaire déclenche des décharges adrénergiques massives (cheese reaction)."
+    },
+    {
+        category: "Psychiatrie",
+        question: "L'Anorexie Mentale sévère comporte des critères de gravité somatique imposant l'hospitalisation, dont :",
+        options: ["Un IMC < 13-14 kg/m2, bradycardie sévère, hypotension, hypokaliémie", "Une prise de poids rapide", "Une hyperkaliémie isolée", "Une tension artérielle élevée"],
+        answer: 0,
+        explanation: "La dénutriotion extrême altère la fonction cardiaque (risque d'arrêt sur trouble du rythme / hypokaliémie)."
+    },
+    {
+        category: "Psychiatrie",
+        question: "La 'Wernicke-Korsakoff Encephalopathy' chez le patient alcoolique chronique est causée par une carence majeure en :",
+        options: ["Vitamine B1 (Thiamine)", "Vitamine C", "Vitamine B12", "Acide folique"],
+        answer: 0,
+        explanation: "La carence en thiamine induit la triade confusion, ataxie, ophtalmoplégie (Wernicke) puis amnésie antérograde avec fabulations (Korsakoff)."
+    },
+
+    // MÉDICO-CHIRURGICAL ET SOINS GENERALISTES (76-100)
+    {
+        category: "Médico-Chirurgical",
+        question: "Chez un patient alité, quel est le premier signe cutané d'une escarre de Stade 1 ?",
+        options: ["Une phlyctène (bulle) remplie de sérum", "Un érythème (rougeur) persistant qui ne blanchit pas à la pression", "Une nécrose noire noirâtre", "Une perte de substance atteignant le muscle"],
+        answer: 1,
+        explanation: "Stade 1 : Rougeur cutanée sur peau intacte ne blanchissant pas au verre / à la vitropression."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Quel paramètre urinaire confirme une Insuffisance Rénale Aiguë de type fonctionnel (pré-rénale) ?",
+        options: ["Na+ urinaire bas (< 20 mEq/L) avec urée U/P > 10", "Na+ urinaire très élevé (> 40 mEq/L)", "Hématurie macroscopique isolée", "Protéinurie massive sans insuffisance"],
+        answer: 0,
+        explanation: "En cause pré-rénale (hypovolémie), le rein réabsorbe au maximum le sodium et l'eau pour préserver la volémie."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Un patient diabétique de Type 1 présente une respiration de Kussmaul (respiration profonde et rapide), une odeur acétonique de l'haleine et une glycémie à 4 g/L. Il s'agit de :",
+        options: ["Un coma hyperosmolal", "Une Acidocétose Diabétique", "Une hypoglycémie sévère", "Une acidose lactique"],
+        answer: 1,
+        explanation: "Carence complète en insuline -> hypercatabolisme lipidique -> corps cétoniques -> acidose métabolique compensée par hyperventilation de Kussmaul."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "En post-opératoire d'une chirurgie abdominale, la reprise du transit intestinal est signée par :",
+        options: ["L'apparition de nausées", "L'émission de gaz et la réapparition des bruits hydro-aériques", "Une baisse de la température", "La diminution des douleurs de cicatrice"],
+        answer: 1,
+        explanation: "Gaz et gazouillis intestinaux (borborygmes) témoignent du levé de l'iléus paralytique réflexe."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Dans le cadre de la prévention des Thromboses Veineuses Profondes (TVP), quel signe clinique au mollet recherche-t-on ?",
+        options: ["Signe de Homans (douleur à la dorsiflexion du pied)", "Signe de Kernig", "Signe de Brudzinski", "Signe de Chvostek"],
+        answer: 0,
+        explanation: "Le signe de Homans (douleur provoquée dans le mollet lors de la dorsiflexion passive du pied) suggère une phlébite."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "La complication majeure et redoutée d'une Fibrillation Auriculaire (FA) non anticoagulée est :",
+        options: ["L'Infarctus du myocarde", "L'Accident Vasculaire Cérébral (AVC) ischémique emboilque", "L'Insuffisance rénale obstructive", "L'Épanchement pleural"],
+        answer: 1,
+        explanation: "La stase sanguine dans l'oriellette gauche favorise la formation de thrombus pouvant migrer dans la circulation cérébrale."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Quel test clinique rapide permet d'évaluer la présence d'une méningite à l'examen physique ?",
+        options: ["Les signes de Kernig et de Brudzinski (raideur de nuque)", "Le signe de Babinski", "Le test de Lachman", "Le signe de Trousseau"],
+        answer: 0,
+        explanation: "Kernig (douleur/résistance à l'extension du genou) et Brudzinski (flexion involontaire des hanches à la flexion de nuque) traduisent le syndrome méningé."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Le signe de Trousseau (main de accoucheur lors du gonflage du brassard à tension) traduit :",
+        options: ["Une hypocalcémie sévère", "Une hyperkaliémie", "Une hyponatrimie", "Une hypercalcémie"],
+        answer: 0,
+        explanation: "L'hypocalcémie augmente l'excitabilité neuromusculaire, déclenchant un tétanie focale à l'ischémie transitoire."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Dans la Maladie de Parkinson, la triade caractéristique comprend :",
+        options: ["Tremblement de repos, akinésie/bradykinésie, rigidité plastique ('en roue dentée')", "Tremblement d'action, parésie, hyperréflexie", "Ataxie, nystagmus, dysarthrie", "Confusion, amnésie, aphasie"],
+        answer: 0,
+        explanation: "C'est la triade extrapyramidale classique du syndrome parkinsonien."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Un patient sous perfusion de Chlorure de Potassium (KCl) doit respecter une règle absolue :",
+        options: ["Injection en bolus IV direct rapide", "Perfusion IV lente sous contrôle strict, JAMAIS de bolus IV direct", "Administration uniquement en IM", "Dilution obligatoire dans du sérum bicarbonaté"],
+        answer: 1,
+        explanation: "L'injection de KCl en IV direct provoque un arrêt cardiaque immédiat en systole."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Quelle position donner à un patient présentant un Œdème Aigu du Poumon (OAP) cardiogénique ?",
+        options: ["Position couchée à plat dos (décubitus dorsal)", "Position assise, jambes pendantes", "Position de Trendelenburg", "Décubitus latéral gauche"],
+        answer: 1,
+        explanation: "La position assise jambes pendantes réduit le retour veineux (précharge) et diminue la stase pulmonaire."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Quelle est la cause la plus fréquente d'Anémie Microcytaire Hypochrome ?",
+        options: ["Carence en Fer (anémie ferriprive)", "Carence en Vitamine B12", "Carence en Acide Folique", "Hémolyse auto-immune"],
+        answer: 0,
+        explanation: "Le manque de fer empêche la synthèse normale de l'hémoglobine, donnant de petits globules rouges (VGM bas)."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Dans le cas d'une Pancréatite Aiguë, les deux enzymes pancréatiques élevées au bilan sanguin sont :",
+        options: ["Lypase et Amylase", "ASAT et ALAT", "Troponine et CPK", "Créatinine et Urée"],
+        answer: 0,
+        explanation: "La lipasémie (supérieure à 3 fois la normale) est l'examen le plus spécifique de la pancréatite aiguë."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "L'Irrigation Bladdérienne Continue (lavage de vessie) après résection de prostate vise principalement à :",
+        options: ["Administrer des antibiotiques locaux", "Prévenir la formation de caillots sanguins et l'obstruction de la sonde", "Guérir l'incontinence", "Mesurer la glycémie urinaire"],
+        answer: 1,
+        explanation: "Le rinçage continu empêche la coagulation du sang dans la vessie post-opératoire."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Un patient porteur d'une BPCO sous oxygénothérapie doit idéalement recevoir un débit d'oxygène :",
+        options: ["Très élevé (10 à 15 L/min)", "Modéré et contrôlé (1 à 2 L/min) pour viser une SpO2 entre 88% et 92%", "Aucun oxygène n'est jamais autorisé", "En hyperbarie uniquement"],
+        answer: 1,
+        explanation: "Chez l'hypercapnique chronique, le drive respiratoire dépend de l'hypoxie. Trop d'O2 supprime la commande respiratoire."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Devant une suspicion d'Accident Vasculaire Cérébral (AVC) aigu, l'examen d'imagerie URGENT indispensable avant tout traitement est :",
+        options: ["Radiographie du crâne", "Scanner cérébral (TDM) sans injection ou IRM", "Échographie doppler des carotides", "Électroencéphalogramme (EEG)"],
+        answer: 1,
+        explanation: "Il faut impérativement différencier l'AVC ischémique de l'AVC hémorragique avant d'envisager une thrombolyse."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Le syndrome de dénutrition aiguë à la reprise de l'alimentation (Refeeding Syndrome) se caractérise par une chute sévère de :",
+        options: ["Le Potassium et surtout le Phosphore (hypophosphatémie)", "Le Sodium", "Le Cholestérol", "Le Calcium isolée"],
+        answer: 0,
+        explanation: "L'insuline stimulée par les glucides fait entrer le phosphore dans les cellules, provoquant une hypophosphatémie mortelle."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Chez un patient porteur d'une sonde naso-gastrique, la méthode la plus fiable pour vérifier son bon positionnement est :",
+        options: ["L'aspiration de liquide vert", "La radiographie pulmonaire / abdominale de contrôle", "L'injection d'air avec auscultation de l'estomac", "L'absence de toux au passage"],
+        answer: 1,
+        explanation: "La radiographie reste le Gold Standard de confirmation du positionnement dans l'estomac avant toute alimentation."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "L'insuffisance surrénalienne aiguë (crise addisonienne) est une urgence métabolique caractérisée par :",
+        options: ["Hypertension et hypernatrimie", "Hypotension sévère, hyponatrimie, hyperkaliémie, hypoglycémie", "Hyperglycémie et hypokaliémie", "Choc cardiogénique avec hypercalcémie"],
+        answer: 1,
+        explanation: "Le déficit absolu en cortisol et aldostérone entraîne fuite de sodium, rétention de potassium et choc."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "La manœuvre de Valsalva (expiration forcée à glotte fermée) peut être utilisée en urgence pour interrompre :",
+        options: ["Une Tachycardie Jonctionnelle paroxystique (Maladie de Bouveret)", "Une Fibrillation ventriculaire", "Un arrêt sino-atrial", "Un bloc auriculoventriculaire du 3ème degré"],
+        answer: 0,
+        explanation: "Stimule le nerf vague (parasympathique) pour ralentir la conduction au niveau du nœud auriculo-ventriculaire."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Quelle est la triade de virchow favorisant la formation de thromboses veineuses ?",
+        options: ["Stase veineuse, lésion endothéliale, hypercoagulabilité", "Hypertension, tabac, obésité", "Fièvre, douleur, rougeur", "Hypotension, bradycardie, hypothermie"],
+        answer: 0,
+        explanation: "La triade de Virchow décrit les trois mécanismes physiopathologiques clés de la thrombogenèse."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Le test d'Allen pratiqué avant une ponction d'artère radiale (Gaz du sang) vérifie :",
+        options: ["La pression artérielle systolique", "La perméabilité de l'artère ulnaire/cubitale (suppléance vasculaire de la main)", "L'absence d'infection locale", "Le taux d'oxygène dans le sang"],
+        answer: 1,
+        explanation: "S'assure que la main reste vascularisée par l'artère ulnaire en cas de thrombose de l'artère radiale."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "Chez un patient atteint de Cirrhose hépatique sévère, l'apparition d'une Encéphalopathie Hépatique est principalement liée à l'accumulation de :",
+        options: ["Bilirubine directe", "Ammoniac (NH3)", "Urée", "Corps cétoniques"],
+        answer: 1,
+        explanation: "Le foie insuffisant ne detoxifie plus l'ammoniac issu des bactéries digestives, qui passe dans le cerveau."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "La conduite à tenir immédiate face à un Patient Éviscéré en post-opératoire (ouverture de cicatrice avec sortie des anse digestives) est :",
+        options: ["Tenter de réintroduire doucement les anses intestinales", "Couvrir les anses exposées avec des compresses stériles imbibées de sérum phy tiède et prévenir le chirurgien", "Donner à boire immédiatement", "Appliquer de la Bétadine pure sur les intestins"],
+        answer: 1,
+        explanation: "Ne jamais réintroduire les viscères. Prévenir la dessiccation et l'infection avec du sérum physiologique stérile."
+    },
+    {
+        category: "Médico-Chirurgical",
+        question: "En cas d'Hyperkaliémie menaçante (> 6.5 mEq/L) avec modifications ECG, quel traitement protège le cœur en urgence ?",
+        options: ["Gluconate de Calcium IV", "Insuline + Glucose IV", "Kayexalate oral", "Furosémide"],
+        answer: 0,
+        explanation: "Le calcium antagonise l'effet de l'hyperkaliémie sur la membrane myocardique (stabilisateur de membrane)."
+    }
+];
+
+let currentQuestions = [];
+
+function generateQuiz() {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '';
+    document.getElementById('submit-btn').style.display = 'block';
+    document.getElementById('restart-btn').style.display = 'none';
+
+    // Tirer 20 questions aléatoires dans les 100
+    const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+    currentQuestions = shuffled.slice(0, 20);
+
+    currentQuestions.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        let optionsHTML = '';
+        q.options.forEach((opt, oIndex) => {
+            optionsHTML += `
+                <label id="label-${qIndex}-${oIndex}">
+                    <input type="radio" name="question-${qIndex}" value="${oIndex}">
+                    ${opt}
+                </label>
+            `;
+        });
+
+        card.innerHTML = `
+            <span class="category-badge">${q.category}</span>
+            <div class="question-text">${qIndex + 1}. ${q.question}</div>
+            <div class="options">${optionsHTML}</div>
+            <div id="expl-${qIndex}" class="explanation"></div>
+        `;
+        container.appendChild(card);
+    });
+    
+    window.scrollTo(0, 0);
+}
+
+function checkAnswers() {
+    let score = 0;
+
+    currentQuestions.forEach((q, qIndex) => {
+        const selected = document.querySelector(`input[name="question-${qIndex}"]:checked`);
+        const explDiv = document.getElementById(`expl-${qIndex}`);
+
+        if (selected) {
+            const answerVal = parseInt(selected.value);
+            if (answerVal === q.answer) {
+                score++;
+                document.getElementById(`label-${qIndex}-${answerVal}`).style.fontWeight = 'bold';
+                document.getElementById(`label-${qIndex}-${answerVal}`).style.color = '#155724';
+            } else {
+                document.getElementById(`label-${qIndex}-${answerVal}`).style.color = '#721c24';
+            }
+        }
+
+        const correctLabel = document.getElementById(`label-${qIndex}-${q.answer}`);
+        if(correctLabel) {
+            correctLabel.style.backgroundColor = '#d4edda';
+            correctLabel.style.borderColor = '#c3e6cb';
+        }
+
+        explDiv.style.display = 'block';
+        explDiv.className = 'explanation correct-bg';
+        explDiv.innerHTML = `<strong>Explication :</strong> ${q.explanation}`;
+    });
+
+    const container = document.getElementById('quiz-container');
+    const scoreBox = document.createElement('div');
+    scoreBox.className = 'score-box';
+    const noteEnPourcent = Math.round((score / currentQuestions.length) * 100);
+    scoreBox.innerHTML = `
+        <h3>Résultat de la session</h3>
+        <div class="score-val">${score} / ${currentQuestions.length} (${noteEnPourcent}%)</div>
+        <p>${noteEnPourcent >= 60 ? "🎉 Félicitations, examen validé !" : "💪 Continue tes révisions, tu vas réussir !"}</p>
+    `;
+    container.prepend(scoreBox);
+
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('restart-btn').style.display = 'block';
+    window.scrollTo(0, 0);
+}
+
+// Démarrage automatique
+generateQuiz();
+</script>
+
+</body>
+</html>

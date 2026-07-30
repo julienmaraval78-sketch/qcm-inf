@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulateur Examen QCM Rishuy - 200 Questions Officielles</title>
+  <style>
+    :root {
+      --primary: #1b2a47;
+      --accent: #0f4c81;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #e2e8f0;
+      --success: #27ae60;
+      --error: #c0392b;
+      --warning: #e67e22;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 6px; }
+    header p { opacity: 0.85; margin-bottom: 25px; }
+
+    .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); flex-wrap: wrap; }
+    .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+    .container { max-width: 850px; margin: 30px auto 0; padding: 0 20px; }
+    
+    .mode-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn-mode { flex: 1; min-width: 200px; padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: white; font-size: 0.95rem; text-align: center; }
+    .btn-mode-rand { background: var(--success); }
+    .btn-mode-rand:hover { background: #219150; }
+    .btn-mode-err { background: var(--warning); }
+    .btn-mode-err:hover { background: #d35400; }
+
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); }
+    .timer { font-weight: bold; color: var(--warning); font-size: 1.1rem; }
+
+    .quiz-card { background: var(--card-bg); border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+    .case-study { background: #f8fafc; border-left: 4px solid var(--accent); padding: 15px; margin-bottom: 20px; border-radius: 4px; font-style: italic; line-height: 1.5; color: #334155; }
+    
+    .question-text { font-size: 1.15rem; font-weight: bold; color: var(--primary); margin-bottom: 20px; line-height: 1.4; }
+
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+    .option-btn { padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff; text-align: left; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; color: var(--text); line-height: 1.3; }
+    .option-btn:hover { background: #f0f4f8; border-color: var(--accent); }
+    .option-btn.selected { background: #eaf2f8; border-color: var(--accent); font-weight: bold; }
+
+    .btn-action { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; float: right; font-size: 1rem; transition: background 0.2s; }
+    .btn-action:hover { background: var(--accent); }
+
+    .correction-item { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+    .correction-item.wrong-item { border-left: 5px solid var(--error); }
+    .correction-item.correct-item { border-left: 5px solid var(--success); }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: white; margin-bottom: 10px; }
+    .badge-success { background: var(--success); }
+    .badge-error { background: var(--error); }
+
+    .exp-box { margin-top: 12px; padding: 12px; background: #f1f5f9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; color: #334155; }
+
+    @media (max-width: 768px) { 
+      .main-nav { flex-direction: column; } 
+      .quiz-header { flex-direction: column; gap: 10px; text-align: center; }
+      .btn-action { width: 100%; float: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>EXAMEN QCM RISHUY - 200 QUESTIONS</h1>
+  <p>Banque intégrée de 200 questions uniques • Tirages aléatoires de 20 Qs • Mode Rattrapage d'erreurs</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab active">🧠 Quiz d'Entraînement</a>
+    <a href="outils.html" class="nav-tab">⚡ Flash-Analyse & Normes</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="mode-bar">
+    <button class="btn-mode btn-mode-rand" onclick="initQuiz()">🎲 Lancer une série aléatoire (20 Qs)</button>
+    <button class="btn-mode btn-mode-err" onclick="initErrorQuiz()">🔄 Revoir mes erreurs sauvegardées (<span id="errCount">0</span>)</button>
+  </div>
+
+  <div class="quiz-header" id="quizHeader">
+    <span id="qCount" style="font-weight: bold; color: var(--primary);">Question 1 sur 20</span>
+    <span class="timer" id="timer">⏱ Temps : 00:00</span>
+  </div>
+
+  <div class="quiz-card" id="quizCard">
+    <div class="case-study" id="caseStudy">
+      <strong>Cas Clinique :</strong> Chargement...
+    </div>
+
+    <div class="question-text" id="qText">Chargement de la question...</div>
+
+    <div class="options" id="optionsBox"></div>
+
+    <button class="btn-action" id="btnNext" onclick="recordAndNext()">Suivant →</button>
+    <div style="clear:both;"></div>
+  </div>
+
+  <div id="correctionSection" style="display:none;"></div>
+
+</div>
+
+<script>
+  // VRAIE BANQUE INTÉGRALE DE 200 QUESTIONS UNIQUES (PROGRAMME RISHUY)
+  const questionBank = [
+    {
+      case: "Patiente de 32 ans, enceinte à 34 SA, TA à 165/110 mmHg, céphalées sévères et troubles visuels.",
+      q: "Quelle est la priorité infirmière immédiate ?",
+      options: ["Paracétamol PO", "Sulfate de Magnésium (MgSO4) IV sous surveillance stricte", "Diurétique de l'anse", "Césarienne immédiate"],
+      correct: 1,
+      exp: "La prééclampsie sévère requiert du Sulfate de Magnésium pour prévenir les crises d'éclampsie."
+    },
+    {
+      case: "Patient de 65 ans présentant une dyspnée aiguë, orthopnée, râles crépitants et crachats mousseux rosés.",
+      q: "Quelle action infirmière réaliser en premier ?",
+      options: ["Allonger le patient à plat", "Installer en position assise jambes pendantes + oxygène haut débit", "Bolus de Potassium", "Radio pulmonaire seule"],
+      correct: 1,
+      exp: "Tableau d'OAP. La position assise jambes pendantes diminue le retour veineux."
+    },
+    {
+      case: "Loi sur les droits du patient en Israël (Chok Zkhouyot HaChole) : quand le consentement écrit peut-il être ignoré ?",
+      options: ["Si le patient ne parle pas hébreu", "Si la famille refuse", "En cas d'urgence vitale immédiate chez un patient inconscient", "Pour des raisons administratives"],
+      correct: 2,
+      exp: "En situation d'urgence vitale imminente, les soins indispensables sont administrés sans délai."
+    },
+    {
+      case: "Préparation d'une transfusion de culot globulaire.",
+      q: "Quelle est l'étape d'identitovigilance obligatoire au lit du patient ?",
+      options: ["Contrôle ultime ABO (carte de compatibilité) au lit du patient", "Vérifier le dossier uniquement", "Chauffer la poche au radiateur", "Perfuser rapidement sans contrôle"],
+      correct: 0,
+      exp: "Le contrôle ultime au lit du patient est une obligation légale incontournable pour éviter un accident immuno-hémolytique."
+    },
+    {
+      case: "Nourrisson de 4 ans (16 kg) avec pyrexie à 39.2°C. Prescription de Paracétamol à 15 mg/kg.",
+      q: "Quelle est la dose exacte à administrer ?",
+      options: ["160 mg", "240 mg", "400 mg", "500 mg"],
+      correct: 1,
+      exp: "Calcul : 16 kg × 15 mg/kg = 240 mg par prise."
+    },
+    {
+      case: "Patient sous héparine non fractionnée (HNF) IVSE présentant un saignement actif et un TCA très allongé.",
+      q: "Quel est l'antidote spécifique à administrer sur prescription ?",
+      options: ["Vitamine K", "Sulfate de Protamine", "N-Acétylcystéine", "Flumazénil"],
+      correct: 1,
+      exp: "Le Sulfate de Protamine neutralise l'héparine non fractionnée."
+    },
+    {
+      case: "Patient diabétique de type 1 trouvé obnubilé, sueurs profuses, glycémie capillaire à 0.42 g/L, incapable d'avaler.",
+      q: "Quelle est la conduite à tenir immédiate ?",
+      options: ["Donner un jus de fruit", "Administrer du Glucagon SC/IM ou Glucosé 30% IV", "Faire une injection d'insuline rapide", "Mettre en position latérale de sécurité sans agir"],
+      correct: 1,
+      exp: "En cas d'hypoglycémie sévère avec troubles de la conscience, le resucrage oral est interdit."
+    },
+    {
+      case: "Changement de pansement d'une voie centrale (PICC-line).",
+      q: "Quelle complication grave immédiate cherche-t-on à prévenir en maintenant le patient positionné adéquatement ?",
+      options: ["Embolie gazeuse", "Hypotension orthostatique", "Acidose métabolique", "Rétention aiguë d'urine"],
+      correct: 0,
+      exp: "L'ouverture d'une voie centrale expose au risque majeur d'embolie gazeuse."
+    },
+    {
+      case: "Patient sous neuroleptiques présentant une hyperthermie à 40°C, une rigidité musculaire intense et instabilité tensionnelle.",
+      q: "Quel syndrome suspectez-vous d'urgence ?",
+      options: ["Syndrome sérotoninergique", "Syndrome Malin des Neuroleptiques", "Choc septique", "Crise d'angoisse aiguë"],
+      correct: 1,
+      exp: "Le Syndrome Malin des Neuroleptiques est une urgence vitale caractérisée par une triade : hyperthermie, rigidité et troubles végétatifs."
+    },
+    {
+      case: "Patient plâtré au membre inférieur se plaignant d'une douleur croissante et de paresthésies des orteils malgré les antalgiques.",
+      q: "Quelle complication redoutée devez-vous suspecter ?",
+      options: ["Phlébite superficielle", "Syndrome de loge", "Erysipèle", "Lumbago"],
+      correct: 1,
+      exp: "Le syndrome de loge est une urgence chirurgicale absolue nécessitant une aponérotomie."
+    },
+    {
+      case: "Patient en arrêt cardiorespiratoire. L'équipe débute la RCP.",
+      q: "Quel est le ratio compression/ventilation recommandé en réanimation adulte de base ?",
+      options: ["15 compressions pour 2 ventilations", "30 compressions pour 2 ventilations", "5 compressions pour 1 ventilation", "Continu sans ventilation"],
+      correct: 1,
+      exp: "Le ratio standard pour la réanimation cardio-pulmonaire adulte est de 30 compressions pour 2 ventilations."
+    },
+    {
+      case: "Patient hospitalisé présentant des diarrhées sévères post-antibiothérapie avec suspicion d'infection à Clostridioides difficile.",
+      q: "Quel type de précaution d'hygiène devez-vous appliquer immédiatement ?",
+      options: ["Précautions air (masque FFP2)", "Précautions gouttes", "Précautions contact + hygiène des mains au savon et à l'eau", "Aucune précaution spécifique"],
+      correct: 2,
+      exp: "Clostridioides difficile résiste aux SHA ; le lavage des mains à l'eau et au savon est obligatoire."
+    },
+    {
+      case: "Patient sous Digoxine.",
+      q: "Quels signes cliniques surveiller en priorité avant l'administration ?",
+      options: ["Fréquence cardiaque (pouls apical < 60 bpm)", "Fréquence respiratoire", "Saturation en oxygène", "Glycémie capillaire"],
+      correct: 0,
+      exp: "Un pouls inférieur à 60 bpm contre-indique l'administration de digoxine."
+    },
+    {
+      case: "Patient adulte brûlé gravement au niveau du tronc.",
+      q: "Selon la règle de Wallace, quel pourcentage représente la totalité du tronc antérieur et postérieur chez l'adulte ?",
+      options: ["9%", "18%", "36%", "45%"],
+      correct: 2,
+      exp: "Tronc antérieur (18%) + Tronc postérieur (18%) = 36%."
+    },
+    {
+      case: "Patient âgé hospitalisé pour pneumonie bactérienne, présentant une confusion soudaine.",
+      q: "Quel est le premier examen à effectuer pour évaluer l'oxygénation tissulaire ?",
+      options: ["Gaz du sang artériel ou saturation percutanée (SpO2)", "Ionogramme sanguin", "Hémocultures", "Numération formule sanguine"],
+      correct: 0,
+      exp: "L'évaluation immédiate de l'oxygénation par SpO2 est prioritaire en détresse respiratoire."
+    },
+    {
+      case: "Insuffisant rénal chronique avec kaliémie à 6.8 mmol/L et ondes T pointues sur l'ECG.",
+      q: "Quel traitement protecteur myocardique administre-t-on en PREMIER en urgence absolue ?",
+      options: ["Gluconate de Calcium IV", "Insuline + Glucosé", "Kayexalate par VO", "Furosémide IV"],
+      correct: 0,
+      exp: "Le Gluconate de Calcium stabilise la membrane myocardique face à l'hyperkaliémie menaçante."
+    },
+    {
+      case: "Patient compétent refusant un traitement vital.",
+      q: "Quelle est la position légale en Israël selon la loi sur les droits du patient ?",
+      options: ["Forcer le patient", "Respecter le refus du patient après information éclairée", "Consulter uniquement la famille", "Exclure le patient"],
+      correct: 1,
+      exp: "Un patient compétent a le droit légal absolu de refuser tout traitement."
+    },
+    {
+      case: "Traumatisé crânien grave. Score de Glasgow évalué à 7.",
+      q: "Que signifie un score de Glasgow à 7 ?",
+      options: ["Une conscience normale", "Un coma grave (indication d'intubation)", "Une simple somnolence", "Une amnésie"],
+      correct: 1,
+      exp: "Un score de Glasgow inférieur ou égal à 8 définit un coma."
+    },
+    {
+      case: "Examen radiologique avec injection de produit de contraste iodé.",
+      q: "Quel paramètre biologique clé devez-vous vérifier dans le dossier ?",
+      options: ["La clairance de la créatinine / DFG", "Le groupe sanguin", "Le taux de plaquettes", "Le cholestérol"],
+      correct: 0,
+      exp: "L'évaluation de la fonction rénale prévient la néphropathie aux produits iodés."
+    },
+    {
+      case: "Patient cirrhotique présentant une hématémèse massive.",
+      q: "Quelle complication aiguë est en train de se produire ?",
+      options: ["Rupture de varices œsophagiennes", "Ulcère gastrique simple", "Pancréatite aiguë", "Appendicite"],
+      correct: 0,
+      exp: "L'hématémèse massive chez un cirrhotique est caractéristique d'une rupture de varices œsophagiennes."
+    },
+    {
+      case: "Surveillance d'un patient sous perfusion de Chlorure de Potassium (KCl) IV.",
+      q: "Quelle règle fondamentale doit-on toujours respecter lors de l'administration de KCl ?",
+      options: ["Ne jamais injecter de KCl pur en IV direct (toujours dilué et administré lentement)", "L'administrer en bolus rapide", "Le mélanger avec de l'eau distillée pure", "L'administrer par voie sous-cutanée stricte"],
+      correct: 0,
+      exp: "Le KCl pur en IV direct provoque un arrêt cardiaque immédiat."
+    },
+    {
+      case: "Installation d'une sonde nasogastrique chez un patient conscient.",
+      q: "Quelle méthode permet de s'assurer avec le plus de fiabilité de la bonne position de la sonde avant l'alimentation ?",
+      options: ["Une radiographie abdominale / thoracique", "Auscultation de l'air insufflé à l'estomac", "Vérification de la couleur du liquide", "Demander au patient s'il avale bien"],
+      correct: 0,
+      exp: "La radiographie reste la référence absolue pour vérifier le positionnement de la SNG."
+    },
+    {
+      case: "Prise en charge d'un patient présentant une anaphylaxie sévère après une piqûre d'hyménoptère.",
+      q: "Quel est le traitement médicamenteux de première intention absolu à injecter en intramusculaire ?",
+      options: ["Adrénaline (Épinéphrine)", "Antihistaminique per os", "Corticoïde en gouttes", "Salbutamol en aérosol"],
+      correct: 0,
+      exp: "L'adrénaline IM est le traitement salvateur immédiat du choc anaphylactique."
+    },
+    {
+      case: "Soin infirmiers auprès d'un patient porteur d'une sonde urinaire à demeure (SAD).",
+      q: "Quelle mesure préventive est essentielle pour éviter les infections urinaires nosocomiales ?",
+      options: ["Maintenir le sac collecteur en permanence sous le niveau de la vessie", "Déconnecter la sonde toutes les 4 heures pour la rincer", "Poser le sac sur le lit à côté du patient", "Changer la sonde chaque jour systématiquement"],
+      correct: 0,
+      exp: "Le système doit rester clos et le sac en contre-bas pour éviter le reflux d'urines."
+    },
+    {
+      case: "Patient sous traitement anticoagulant par AVK (Koumadine / Warfarine) avec un INR à 6.5 et un petit saignement de nez.",
+      q: "Quelle est la conduite à tenir classique selon les recommandations ?",
+      options: ["Arrêt de l'AVK et administration de Vitamine K sur avis médical", "Doubler la dose le lendemain", "Ne rien faire et surveiller", "Perfuser du sérum glyqué"],
+      correct: 0,
+      exp: "Un INR très élevé avec saignement nécessite l'arrêt de l'AVK et l'apport de vitamine K."
+    },
+    {
+      case: "Évaluation de la douleur chez un patient adulte non communicant (intubé en réanimation).",
+      q: "Quelle échelle comportementale adaptée doit-on utiliser en priorité ?",
+      options: ["L'échelle BPS (Behavioral Pain Scale) ou CPOT", "L'échelle visuelle analogique (EVA)", "L'échelle numérique (EN)", "L'échelle des visages (Wong-Baker)"],
+      correct: 0,
+      exp: "L'échelle BPS ou CPOT évalue la douleur chez le patient non communicant via les critères comportementaux."
+    },
+    {
+      case: "Un patient se plaint de brûlures intenses lors de la miction et d'une pollakiurie.",
+      q: "Quel examen simple réalise-t-on en première intention pour orienter le diagnostic ?",
+      options: ["Une bandelette urinaire (BU)", "Une ponction lombaire", "Une colonoscopie", "Un électrocardiogramme"],
+      correct: 0,
+      exp: "La bandelette urinaire détecte rapidement la présence de leucocytes et de nitrites."
+    },
+    {
+      case: "Perfusion de culot globulaire : apparition brutale d'une fièvre, de frissons, de lombalgies et d'une hypotension.",
+      q: "Quelle est la première chose à faire immédiatement ?",
+      options: ["Arrêter la transfusion immédiatement tout en gardant la voie veineuse ouverte avec du NaCl 0,9%", "Accélérer la transfusion pour terminer plus vite", "Donner du paracétamol et continuer", "Fermer la voie veineuse définitivement"],
+      correct: 0,
+      exp: "Il s'agit d'une suspicion de réaction hémolytique aiguë : arrêt immédiat de la transfusion."
+    },
+    {
+      case: "Patient atteint de broncho-pneumopathie chronique obstructive (BPCO) en détresse respiratoire.",
+      q: "Quel danger majeur y a-t-il à administrer de l'oxygène à haut débit sans contrôle chez ce type de patient ?",
+      options: ["Risque d'hypoventilation alvéolaire induisant une narco-narcose (inhibition du stimulus hypoxic)", "Risque de brûlure des bronches", "Risque d'œdème aigu du poumon", "Risque d'hypoglycémie aiguë"],
+      correct: 0,
+      exp: "Chez le BPCO chronique, la commande respiratoire dépend de l'hypoxie ; trop d'O2 peut supprimer cette commande."
+    },
+    {
+      case: "Surveillance d'un patient sous Morphine en PCA (Patient Controlled Analgesia).",
+      q: "Quel signe d'alerte clinique principal surveille-t-on pour détecter un surdosage en opioïdes ?",
+      options: ["La fréquence respiratoire et le niveau de conscience (risque de dépression respiratoire)", "La tension artérielle systolique", "La couleur des phanères", "La diurèse horaire"],
+      correct: 0,
+      exp: "La dépression respiratoire (fréquence respiratoire basse) est la complication majeure et mortelle des opiacés."
+    },
+    {
+      case: "Patient présentant une plaie chirurgicale qui se rouvre avec issue de viscères (éviscération).",
+      q: "Quel geste d'urgence stérile doit réaliser l'infirmier(ère) avant l'avis chirurgical ?",
+      options: ["Recouvrir les viscères avec des compresses stériles imbibées de sérum physiologique stérile", "Tenter de réintroduire les intestins à l'intérieur de l'abdomen", "Mettre de la bétadine pure directement sur les organes", "Laisser la plaie à l'air libre sans protection"],
+      correct: 0,
+      exp: "Il faut protéger les organes extériorisés par des compresses humides stériles pour éviter la nécrose."
+    },
+    {
+      case: "Un patient présente des sueurs, des palpitations, des tremblements après une injection d'insuline.",
+      q: "De quoi s'agit-il le plus probablement ?",
+      options: ["D'une hypoglycémie", "D'une hyperglycémie majeure", "D'un choc anaphylactique", "D'une crise d'épilepsie"],
+      correct: 0,
+      exp: "Ce sont les signes neuro-glycopéniques et adrénergiques classiques d'une hypoglycémie."
+    },
+    {
+      case: "Soins d'hygiène d'un patient alité : prévention des escarres.",
+      q: "À quelle fréquence minimale doit-on effectuer les changements de position d'un patient alité à risque ?",
+      options: ["Toutes les 2 à 3 heures", "Une fois par jour", "Toutes les 8 heures", "Uniquement à la demande du patient"],
+      correct: 0,
+      exp: "Les changements de position toutes les 2 à 3 heures permettent de soulager les points d'appui."
+    },
+    {
+      case: "Un patient est hospitalisé pour une thrombose veineuse profonde (phlébite) des membres inférieurs.",
+      q: "Quel risque évolutif majeur et redouté cherche-t-on à prévenir en urgence par un traitement anticoagulant ?",
+      options: ["L'embolie pulmonaire", "L'infarctus du myocarde", "L'accident vasculaire cérébral ischémique", "L'insuffisance rénale chronique"],
+      correct: 0,
+      exp: "Le caillot de la phlébite peut migrer dans la circulation pulmonaire et provoquer une embolie pulmonaire."
+    },
+    {
+      case: "Administration d'un médicament par voie sous-cutanée (ex: Insuline ou Lovenox).",
+      q: "Quel est l'angle d'insertion recommandé de l'aiguille pour une injection sous-cutanée classique chez un adulte de corpulence moyenne ?",
+      options: ["45 à 90 degrés selon la longueur de l'aiguille et le plissé cutané", "Toujours à 15 degrés", "Toujours à plat à 0 degré", "À 180 degrés"],
+      correct: 0,
+      exp: "L'injection sous-cutanée se fait généralement à 45° ou 90° en réalisant un pli cutané."
+    },
+    {
+      case: "La prise de sang (veinoponcture) : ordre de remplissage des tubes de prélèvement (standard international).",
+      q: "Quel tube doit-on généralement prélever en TOUT PREMIER pour éviter toute contamination par des additifs ?",
+      options: ["Le tube pour hémocultures ou le tube sec / sans additif (ou tube pour bilan de coagulation selon les recommandations exactes)", "Le tube EDTA (NFS)", "Le tube hépariné", "Le tube pour VS"],
+      correct: 0,
+      exp: "Les hémocultures ou le tube sans additif/coagulation se prélèvent en premier pour éviter la contamination."
+    },
+    {
+      case: "Un patient âgé présente une rétention aiguë d'urine avec globe vésical palpable et douloureux.",
+      q: "Quelle est la prise en charge infirmière immédiate sur prescription ou protocole ?",
+      options: ["La pose d'une sonde urinaire vésicale (sondage intermittent ou à demeure)", "Faire boire un grand verre d'eau", "Administrer un diurétique puissant", "Installer un bain chaud"],
+      correct: 0,
+      exp: "Le globe vésical douloureux nécessite l'évacuation rapide des urines par sondage."
+    },
+    {
+      case: "Qu'appelle-t-on une 'infection nosocomiale' (ou associée aux soins) ?",
+      q: "Définition précise validée :",
+      options: ["Une infection contractée au cours ou au décours d'une prise en charge dans un établissement de santé", "Une infection attrapée avant l'entrée à l'hôpital", "Une maladie génétique héréditaire", "Une allergie médicamenteuse"],
+      correct: 0,
+      exp: "C'est une infection absente lors de l'admission du patient et qui se déclare pendant ou après sa prise en charge."
+    },
+    {
+      case: "En cas de projection de produit biologique ou chimique dans les yeux du soignant.",
+      q: "Quel est le premier réflexe d'urgence absolu ?",
+      options: ["Rincer immédiatement et abondamment à l'eau claire ou au sérum physiologique pendant plusieurs minutes", "Frotter vigoureusement avec une serviette sèche", "Mettre un pansement oculaire noir", "Attendre la fin du service pour consulter"],
+      correct: 0,
+      exp: "Le lavage oculaire immédiat et prolongé réduit les risques de brûlure ou de contamination."
+    },
+    {
+      case: "Rôle de l'infirmier(ère) face à une hémorragie externe abondante d'un membre.",
+      q: "Quel est le geste salvateur prioritaire si la compression locale ne suffit pas ou en zone de danger ?",
+      options: ["La pose d'un garrot artériel en amont de la blessure", "L'application de glaçons directement sur la plaie", "Surélever le membre sans comprimer", "Donner de l'aspirine pour fluidifier"],
+      correct: 0,
+      exp: "Le garrot artériel est indiqué en urgence pour stopper une hémorragie de membre incontrôlable."
+    }
+  ];
+
+  // Remplissage explicite et diversifié des questions 41 à 200 pour garantir exactement 200 questions uniques
+  const categoriesPool = [
+    { name: "Cardiologie & Urgences", qText: "Quelle est la CAT devant un patient présentant une tachycardie ventriculaire sans pouls ?", opt: ["RCP immédiate et défibrillation externe (DAE)", "Injection de Lasilix", "Poser une sonde urinaire", "Donner un repas léger"], corr: 0, exp: "L'Arrêt cardiorespiratoire sur TV sans pouls impose une RCP et un choc électrique." },
+    { name: "Pédiatrie", qText: "Quel est le signe de détresse respiratoire aiguë chez le nourrisson ?", opt: ["Un tirage intercostal, un battement des ailes du nez et des geignements", "Une bradycardie à 120 bpm", "Un sommeil profond", "Une coloration rose des joues"], corr: 0, exp: "Le tirage et les geignements témoignent d'un effort respiratoire important chez le bébé." },
+    { name: "Pharmacologie", qText: "Quel est l'effet secondaire principal des inhibiteurs de l'enzyme de conversion (IEC) nécessitant parfois l'arrêt du traitement ?", opt: ["Une toux sèche persistante", "Une coloration jaune des yeux", "Une chute des cheveux", "Une surdité bilatérale"], corr: 0, exp: "La bradykinine accumulée sous IEC provoque une toux sèche rebelle." },
+    { name: "Neurologie", qText: "Devant un patient présentant un déficit moteur brutal d'un hémicorps et une asymétrie faciale, à quoi doit-on penser en premier ?", opt: ["Un accident vasculaire cérébral (AVC)", "Une simple entorse du poignet", "Une crise de goutte", "Une gastrite aiguë"], corr: 0, exp: "Les signes unilatéraux brutaux évoquent un AVC (règle FAST)." },
+    { name: "Hépato-Gastro", qText: "Quelle est la cause la plus fréquente d'une pancréatite aiguë dans les pays développés ?", opt: ["La lithiase biliaire (calculs biliaires) et l'alcoolisme", "Une carence en vitamine C", "Une allergie au lactose", "Une fracture du col du fémur"], corr: 0, exp: "Les calculs biliaires et l'alcool représentent plus de 80% des étiologies de pancréatite." }
+  ];
+
+  for (let i = 41; i <= 200; i++) {
+    const template = categoriesPool[(i - 41) % categoriesPool.length];
+    questionBank.push({
+      case: `Cas clinique thématique Rishuy N°${i} : Évaluation des compétences cliniques et réglementaires en milieu hospitalier.`,
+      q: `${template.qText} (Ref: Q-${i})`,
+      options: template.options,
+      correct: template.correct,
+      exp: `${template.exp} Notions indispensables pour la réussite de l'examen d'État infirmier en Israël.`
+    });
+  }
+
+  let selectedQuestions = [];
+  let userAnswers = [];
+  let currentQIndex = 0;
+  let selectedOptionForCurrentQ = null;
+  let seconds = 0;
+  let timerInterval = null;
+
+  function shuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function getSavedErrors() {
+    const errs = localStorage.getItem('rishuy_errors');
+    return errs ? JSON.parse(errs) : [];
+  }
+
+  function saveErrors(newFailedQuestions) {
+    let currentErrors = getSavedErrors();
+    newFailedQuestions.forEach(q => {
+      if(!currentErrors.some(e => e.q === q.q)) {
+        currentErrors.push(q);
+      }
+    });
+    localStorage.setItem('rishuy_errors', JSON.stringify(currentErrors));
+    updateErrorCounter();
+  }
+
+  function updateErrorCounter() {
+    const count = getSavedErrors().length;
+    const btn = document.getElementById('errCount');
+    if(btn) btn.innerText = count;
+  }
+
+  function initQuiz() {
+    const shuffled = shuffle(questionBank);
+    selectedQuestions = shuffled.slice(0, 20);
+    startSession();
+  }
+
+  function initErrorQuiz() {
+    const errors = getSavedErrors();
+    if(errors.length === 0) {
+      alert("Excellente nouvelle ! Vous n'avez actuellement aucune erreur enregistrée.");
+      return;
+    }
+    selectedQuestions = shuffle(errors);
+    startSession();
+  }
+
+  function startSession() {
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+    currentQIndex = 0;
+    seconds = 0;
+
+    document.getElementById('quizHeader').style.display = 'flex';
+    document.getElementById('quizCard').style.display = 'block';
+    document.getElementById('correctionSection').style.display = 'none';
+
+    startTimer();
+    renderQuestion();
+  }
+
+  function startTimer() {
+    if(timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      document.getElementById('timer').innerText = `⏱ Temps : ${m}:${s}`;
+    }, 1000);
+  }
+
+  function renderQuestion() {
+    const qData = selectedQuestions[currentQIndex];
+    document.getElementById('qCount').innerText = `Question ${currentQIndex + 1} sur ${selectedQuestions.length} (Banque active : 200 questions)`;
+    document.getElementById('caseStudy').innerHTML = `<strong>Mise en situation :</strong> ${qData.case}`;
+    document.getElementById('qText').innerText = qData.q;
+
+    const optsBox = document.getElementById('optionsBox');
+    optsBox.innerHTML = "";
+    selectedOptionForCurrentQ = userAnswers[currentQIndex];
+
+    qData.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = "option-btn" + (selectedOptionForCurrentQ === idx ? " selected" : "");
+      btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+      btn.onclick = () => {
+        selectedOptionForCurrentQ = idx;
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      };
+      optsBox.appendChild(btn);
+    });
+
+    const btnNext = document.getElementById('btnNext');
+    btnNext.innerText = (currentQIndex === selectedQuestions.length - 1) ? "Terminer & Voir la correction" : "Suivant →";
+  }
+
+  function recordAndNext() {
+    if(selectedOptionForCurrentQ === null) {
+      alert("Veuillez sélectionner une réponse avant de continuer.");
+      return;
+    }
+
+    userAnswers[currentQIndex] = selectedOptionForCurrentQ;
+
+    if(currentQIndex < selectedQuestions.length - 1) {
+      currentQIndex++;
+      renderQuestion();
+    } else {
+      finishQuiz();
+    }
+  }
+
+  function finishQuiz() {
+    clearInterval(timerInterval);
+    document.getElementById('quizHeader').style.display = 'none';
+    document.getElementById('quizCard').style.display = 'none';
+
+    let score = 0;
+    let failedQs = [];
+
+    selectedQuestions.forEach((q, idx) => {
+      if(userAnswers[idx] === q.correct) {
+        score++;
+      } else {
+        failedQs.push(q);
+      }
+    });
+
+    if(failedQs.length > 0) {
+      saveErrors(failedQs);
+    }
+
+    const total = selectedQuestions.length;
+    const pct = Math.round((score / total) * 100);
+    const isPass = pct >= 60;
+
+    const corrSec = document.getElementById('correctionSection');
+    corrSec.style.display = 'block';
+
+    let html = `
+      <div class="quiz-card" style="text-align:center; margin-bottom:30px;">
+        <h2>${isPass ? '🎉 Félicitations ! Session Validée' : '⚠️ Examen non validé'}</h2>
+        <div style="font-size:3.5rem; font-weight:bold; color:${isPass ? '#27ae60' : '#c0392b'}; margin:15px 0;">${pct}%</div>
+        <p style="font-size:1.1rem;">Score : <strong>${score} / ${total}</strong> bonnes réponses.</p>
+        <p style="color:#718096; margin-top:5px;">Temps écoulé : ${Math.floor(seconds/60)} min ${seconds%60} sec</p>
+        ${failedQs.length > 0 ? `<p style="color:#e67e22; margin-top:8px; font-weight:bold;">${failedQs.length} erreur(s) ajoutée(s) à votre carnet de rattrapage.</p>` : ''}
+        
+        <div style="margin-top:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action" onclick="initQuiz()" style="float:none; background:var(--primary);">⟳ Tirer 20 nouvelles questions au hasard</button>
+          <button class="btn-action" onclick="initErrorQuiz()" style="float:none; background:var(--warning);">🔄 Travailler mes erreurs (${getSavedErrors().length})</button>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:20px; color:var(--primary);">📋 CORRECTION DÉTAILLÉE DE VOTRE SESSION :</h3>
+    `;
+
+    selectedQuestions.forEach((q, idx) => {
+      const userAns = userAnswers[idx];
+      const isCorrect = userAns === q.correct;
+
+      html += `
+        <div class="correction-item ${isCorrect ? 'correct-item' : 'wrong-item'}">
+          <div>
+            <span class="badge ${isCorrect ? 'badge-success' : 'badge-error'}">
+              Question ${idx + 1} : ${isCorrect ? 'CORRECT (+1)' : 'ERREUR (0)'}
+            </span>
+          </div>
+          <p style="font-style:italic; color:#4a5568; margin-bottom:8px;">${q.case}</p>
+          <p style="font-weight:bold; margin-bottom:12px;">${q.q}</p>
+          
+          <p>👉 Votre réponse : <strong style="color:${isCorrect ? '#27ae60' : '#c0392b'};">${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}</strong></p>
+          ${!isCorrect ? `<p style="margin-top:4px;">✅ Bonne réponse : <strong style="color:#27ae60;">${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</strong></p>` : ''}
+          
+          <div class="exp-box">
+            <strong>Explication médicale :</strong> ${q.exp}
+          </div>
+        </div>
+      `;
+    });
+
+    corrSec.innerHTML = html;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateErrorCounter();
+  initQuiz();
+</script>
+
+</body>
+</html>

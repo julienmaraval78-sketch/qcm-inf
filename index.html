@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Préparation Examen Rishuy - Infirmière</title>
+  <style>
+    :root {
+      --primary: #1b2a47;
+      --accent: #0f4c81;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #e2e8f0;
+      --success: #27ae60;
+      --warning: #e67e22;
+      --error: #c0392b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 6px; }
+    header p { opacity: 0.85; margin-bottom: 25px; }
+
+    .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); flex-wrap: wrap; }
+    .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+    .container { max-width: 1000px; margin: 30px auto 0; padding: 0 20px; }
+    
+    .grid-fiches { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+    
+    .card-fiche { background: var(--card-bg); border-radius: 12px; padding: 22px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-fiche:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: var(--accent); }
+    
+    .card-tag { font-size: 0.75rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .card-title { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+    .card-desc { font-size: 0.9rem; color: #64748b; line-height: 1.4; margin-bottom: 15px; }
+    .card-btn { background: #eaf2f8; color: var(--accent); border: none; padding: 10px; border-radius: 6px; font-weight: bold; text-align: center; font-size: 0.9rem; }
+
+    /* Fenêtre Modale pour afficher la fiche en intégralité */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+    .modal-content { background: white; border-radius: 12px; max-width: 850px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 35px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; font-weight: bold; color: #64748b; cursor: pointer; }
+    .close-modal:hover { color: var(--error); }
+
+    .fiche-body h2 { color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; font-size: 1.5rem; }
+    .fiche-body h3 { color: var(--accent); margin: 25px 0 10px 0; font-size: 1.15rem; border-left: 3px solid var(--accent); padding-left: 8px; }
+    .fiche-body p, .fiche-body li { line-height: 1.6; font-size: 0.95rem; color: #334155; margin-bottom: 8px; }
+    .fiche-body ul { margin-left: 20px; margin-bottom: 15px; }
+    .fiche-body .alert-box { background: #fff7ed; border-left: 4px solid var(--warning); padding: 14px; margin: 15px 0; border-radius: 4px; font-size: 0.95rem; }
+    .fiche-body table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+    .fiche-body th, .fiche-body td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+    .fiche-body th { background: #f1f5f9; color: var(--primary); }
+
+    @media (max-width: 768px) {
+      .main-nav { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>PLATEFORME DE RÉVISION RISHUY</h1>
+  <p>Fiches de synthèse intégrales • Examen d'État Infirmier en Israël</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab active">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab">🧠 Quiz d'Entraînement</a>
+    <a href="outils.html" class="nav-tab">⚡ Flash-Analyse & Normes</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2 style="color: var(--primary); margin-bottom: 10px;">📚 Fiches de Synthèse Médicales & Législatives</h2>
+  <p style="color: #64748b; margin-bottom: 20px;">Cliquez sur une fiche pour consulter l'intégralité (100%) des cours et protocoles officiels.</p>
+
+  <div class="grid-fiches">
+    <!-- Fiche 1 -->
+    <div class="card-fiche" onclick="openFiche('obstetrique')">
+      <div>
+        <div class="card-tag">Maternité & Obstétrique</div>
+        <div class="card-title">Prééclampsie, HPP & Score d'Apgar</div>
+        <div class="card-desc">Sulfate de magnésium, diagnostic différentiel des saignements du 3ème trimestre et prise en charge de l'atonie utérine.</div>
+      </div>
+      <div class="card-btn">Ouvrir la fiche intégrale →</div>
+    </div>
+
+    <!-- Fiche 2 -->
+    <div class="card-fiche" onclick="openFiche('cardio')">
+      <div>
+        <div class="card-tag">Urgence & Cardio</div>
+        <div class="card-title">OAP & Syndrome Coronarien Aigu (SCA)</div>
+        <div class="card-desc">Protocoles d'urgence, positionnement, oxygénothérapie, administration de trinitrine et délais ECG stricts.</div>
+      </div>
+      <div class="card-btn">Ouvrir la fiche intégrale →</div>
+    </div>
+
+    <!-- Fiche 3 -->
+    <div class="card-fiche" onclick="openFiche('pharma')">
+      <div>
+        <div class="card-tag">Pharmacologie</div>
+        <div class="card-title">Antidotes & Médicaments à Marge Étroite</div>
+        <div class="card-desc">Protamine, Vitamine K, Naloxone, Lithium, Digoxine et règles de calcul de débit par gravité.</div>
+      </div>
+      <div class="card-btn">Ouvrir la fiche intégrale →</div>
+    </div>
+
+    <!-- Fiche 4 -->
+    <div class="card-fiche" onclick="openFiche('pediatrie')">
+      <div>
+        <div class="card-tag">Pédiatrie</div>
+        <div class="card-title">Bronchiolite, Déshydratation & Réanimation</div>
+        <div class="card-desc">Signes d'épuisement respiratoire du nourrisson, formule de Holliday-Segar et réanimation néonatale de base.</div>
+      </div>
+      <div class="card-btn">Ouvrir la fiche intégrale →</div>
+    </div>
+
+    <!-- Fiche 5 -->
+    <div class="card-fiche" onclick="openFiche('legislation')">
+      <div>
+        <div class="card-tag">Législation Israélienne</div>
+        <div class="card-title">Loi Droits du Patient (חוק זכויות החולה)</div>
+        <div class="card-desc">Consentement éclairé, exceptions légales d'urgence vitale, secret médical et comités d'éthique.</div>
+      </div>
+      <div class="card-btn">Ouvrir la fiche intégrale →</div>
+    </div>
+
+    <!-- Fiche 6 -->
+    <div class="card-fiche" onclick="openFiche('psychiatrie')">
+      <div>
+        <div class="card-tag">Psychiatrie</div>
+        <div class="card-title">SMN, Contention & Hospitalisation Sous Contrainte</div>
+        <div class="card-desc">Symptomatologie du Syndrome Malin des Neuroleptiques, règles de contention et encadrement légal en Israël.</div>
+      </div>
+      <div class="card-btn">Ouvrir la fiche intégrale →</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Affichage Fiche -->
+<div class="modal-overlay" id="ficheModal" onclick="closeModalOnOverlay(event)">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeFiche()">&times;</span>
+    <div class="fiche-body" id="ficheContent"></div>
+  </div>
+</div>
+
+<script>
+  const fichesData = {
+    obstetrique: `
+      <h2> Obstétrique & Urgences Maternelles (Intégral)</h2>
+      
+      <h3>1. Prééclampsie Sévère & Éclampsie</h3>
+      <p><strong>Définition & Triade :</strong> Apparition d'une hypertension artérielle (TA ≥ 140/90 mmHg) associée à une protéinurie (> 0.3g/24h) après la 20ème semaine d'aménorrhée (SA).</p>
+      <p><strong>Critères de sévérité (Rishuy) :</strong></p>
+      <ul>
+        <li>TA systolique ≥ 160 mmHg ou diastolique ≥ 110 mmHg.</li>
+        <li>Céphalées persistantes, troubles visuels (scotomes, vision floue, phosphènes).</li>
+        <li>Barre épigastrique (douleur de l'hypochondre droit) traduisant une souffrance hépatique.</li>
+        <li>Oligurie (< 500 mL/24h) et anomalies biologiques (thrombopénie, élévation des transaminases).</li>
+      </ul>
+      <div class="alert-box">
+        <strong>Traitement de référence de la crise :</strong> Administration intraveineuse de <strong>Sulfate de Magnésium (MgSO4)</strong> pour la prévention et le traitement des convulsions (éclampsie).<br>
+        <em>Surveillance infirmière stricte avant et pendant l'injection :</em>
+        <ul>
+          <li>Présence des réflexes ostéo-tendineux / rotuliens (leur abolition signe le début d'un surdosage).</li>
+          <li>Fréquence respiratoire > 12 cycles/min (risque de dépression respiratoire).</li>
+          <li>Diurèse horaire > 30 mL/h (élimination rénale exclusive du magnésium).</li>
+          <li><strong>Antidote d'urgence :</strong> Gluconate de Calcium disponible immédiatement au lit de la patiente.</li>
+        </ul>
+      </div>
+
+      <h3>2. Hémorragies du Troisième Trimestre : Placenta Praevia vs Hématome Rétro-Placentaire (HRP)</h3>
+      <table>
+        <tr>
+          <th>Paramètre</th>
+          <th>Placenta Praevia</th>
+          <th>Hématome Rétro-Placentaire (HRP)</th>
+        </tr>
+        <tr>
+          <td><strong>Type de saignement</strong></td>
+          <td>Sang rouge vif, abondant, indolore, survenant au repos.</td>
+          <td>Sang noir, souvent peu abondant en externe, très douloureux (douleur utérine intense).</td>
+        </tr>
+        <tr>
+          <td><strong>État utérin</strong></td>
+          <td>Utérus souple, relâché entre les contractions.</td>
+          <td>Utérus de bois, hypertonique, douloureux à la palpation.</td>
+        </tr>
+        <tr>
+          <td><strong>Contre-indication absolue</strong></td>
+          <td><strong>LE TOUCHER VAGINAL (TV)</strong> est formellement interdit (risque d'aggravation cataclysmique).</td>
+          <td>Nécessite une extraction fœtale en urgence absolue (césarienne).</td>
+        </tr>
+      </table>
+
+      <h3>3. Hémorragie du Post-Partum (HPP)</h3>
+      <p>Définie par une perte sanguine > 500 mL après voie basse ou > 1000 mL après césarienne dans les 24 premières heures.</p>
+      <ul>
+        <li><strong>Cause principale (dans 80% des cas) :</strong> L'atonie utérine (défaut de contraction des fibres musculaires utérines).</li>
+        <li><strong>Conduite à tenir infirmière immédiate :</strong>
+          <ul>
+            <li>Massage utérin transabdominal vigoureux et continu (stimule la rétraction).</li>
+            <li>Sondage urinaire évacuateur (une vessie pleine empêche l'utérus de se contracter).</li>
+            <li>Administration de molécules utérotoniques sur prescription (Oxytocine / Syntocinon, Méthergine, Misoprostol).</li>
+            <li>Pose de deux voies veineuses de gros calibre, remplissage vasculaire et surveillance hémodynamique stricte.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>4. Score d'Apgar du Nouveau-Né</h3>
+      <p>Évalué à 1 minute, 5 minutes et éventuellement 10 minutes de vie. Note de 0 à 2 pour chaque paramètre (Total sur 10) :</p>
+      <ul>
+        <li><strong>A</strong>pparence (Coloration cutanée : rose partout = 2, acrocyanose = 1, paleur/bleu = 0)</li>
+        <li><strong>P</strong>ouls (Fréquence cardiaque : > 100 bpm = 2, < 100 bpm = 1, absent = 0)</li>
+        <li><strong>G</strong>rimace (Réactivité aux stimuli / passage de sonde : cri vigoureux = 2, grimace = 0-1)</li>
+        <li><strong>A</strong>ctivité (Tonus musculaire : mouvements actifs = 2, flexion modérée = 1, flasque = 0)</li>
+        <li><strong>R</strong>espiration (Effort respiratoire : cri vigoureux/pleurs = 2, irrégulier/lent = 1, absent = 0)</li>
+      </ul>
+    `,
+
+    cardio: `
+      <h2> Urgences Cardiovasculaires : OAP & SCA (Intégral)</h2>
+      
+      <h3>1. Œdème Aigu du Poumon d'origine Cardiogénique (OAP)</h3>
+      <p>Urgence médicale majeure caractérisée par une inondation alvéolaire aiguë consécutive à une élévation brutale des pressions de remplissage du ventricule gauche (insuffisance ventriculaire gauche aiguë).</p>
+      <p><strong>Signes cliniques caractéristiques :</strong></p>
+      <ul>
+        <li>Dyspnée paroxystique majeure avec orthopnée stricte (le patient ne peut s'allonger).</li>
+        <li>Polypnée superficielle, cyanose, angoisse intense.</li>
+        <li>Râles crépitants remontant des bases pulmonaires vers les sommets ("marée montante").</li>
+        <li>Grésillement laryngé, expectorations mousseuses et rosées (caractéristiques).</li>
+      </ul>
+      <div class="alert-box">
+        <strong>Protocole d'urgence infirmière immédiat :</strong>
+        <ol>
+          <li>Installer le patient en <strong>position assise, jambes pendantes</strong> hors du lit : réduit immédiatement le retour veineux (précharge) et soulage le cœur.</li>
+          <li>Administrer de l'oxygène à haut débit (masque à haute concentration).</li>
+          <li>Poser une voie veineuse périphérique (VVP) et administrer un diurétique de l'anse en bolus IV (Furosémide / Lasilix) selon prescription.</li>
+          <li>Administrer des dérivés nitrés sublinguaux (Trinitrine) si la pression artérielle systolique est ≥ 100-110 mmHg pour diminuer la postcharge.</li>
+          <li>Surveillance continue : saturation (SpO2), fréquence respiratoire, tension artérielle, diurèse.</li>
+        </ol>
+      </div>
+
+      <h3>2. Syndrome Coronarien Aigu (SCA)</h3>
+      <p>Ischémie myocardique aiguë secondaire à l'obstruction d'une artère coronaire par une plaque d'athérome compliquée (thrombose).</p>
+      <ul>
+        <li><strong>Signes d'alerte :</strong> Douleur thoracique constrictive, rétrosternale, intense, prolongée (> 20 min), irradiant typiquement vers la mâchoire, le cou, les épigastres et le bras/poignet gauche, s'accompagnant souvent de sueurs profuses, de nausées et d'une sensation de mort imminente.</li>
+        <li><strong>Règle d'or (Délai porte-ballon / ECG) :</strong> L'électrocardiogramme (ECG) 12 dérivations doit impérativement être réalisé et interprété dans les <strong>10 minutes</strong> suivant l'arrivée du patient.</li>
+        <li><strong>Prise en charge initiale :</strong> Repose-lit strict, monitorage continu, oxygénothérapie (uniquement si SpO2 < 92%), antalgiques (Morphine), anti-agrégants plaquettaires (Aspirine / Plavix) et préparation pour une coronarographie en urgence (USIC / Salle de cathétérisme).</li>
+      </ul>
+    `,
+
+    pharma: `
+      <h2> Pharmacologie & Sécurité Médicamenteuse (Intégral)</h2>
+      
+      <h3>1. Antidotes Fondamentaux à Maîtriser pour le Rishuy</h3>
+      <table>
+        <tr>
+          <th>Classe Médicamenteuse / Toxique</th>
+          <th>Antidote Spécifique</th>
+          <th>Mode d'action / Remarques</th>
+        </tr>
+        <tr>
+          <td><strong>Héparine Non Fractionnée (HNF)</strong></td>
+          <td>Sulfate de Protamine</td>
+          <td>Neutralise immédiatement l'effet anticoagulant de l'héparine (1 mg de protamine neutralise 100 UI d'héparine).</td>
+        </tr>
+        <tr>
+          <td><strong>Antivitamine K (AVK - Coumadine / Sintrom)</strong></td>
+          <td>Vitamine K (Phytoménadione) + PPSB (Facteurs prothrombiques)</td>
+          <td>Restitution des facteurs de coagulation dépendants de la vitamine K en cas de surdosage ou d'hémorragie.</td>
+        </tr>
+        <tr>
+          <td><strong>Morphine & Opioïdes</strong></td>
+          <td>Naloxone (Narcan)</td>
+          <td>Antagoniste des récepteurs opioïdes. Utilisé en cas de dépression respiratoire aiguë (FR < 10/min).</td>
+        </tr>
+        <tr>
+          <td><strong>Benzodiazépines (Valium, Lexotanil...)</strong></td>
+          <td>Flumazénil (Anxate)</td>
+          <td>Antagoniste sélectif des récepteurs benzodiazépiques en cas de surdosage sédatif sévère.</td>
+        </tr>
+        <tr>
+          <td><strong>Paracétamol (Surdosage)</strong></td>
+          <td>N-Acétylcystéine (Mucomyst IV)</td>
+          <td>Protège le foie contre la nécrose hépatique aiguë si administré rapidement après l'ingestion toxique.</td>
+        </tr>
+      </table>
+
+      <h3>2. Médicaments à Marge Thérapeutique Étroite</h3>
+      <div class="alert-box">
+        <strong>Sels de Lithium (Lithuril) :</strong> Zone thérapeutique étroite (0.6 - 1.2 mEq/L).<br>
+        <em>Signes d'intoxication / surdosage :</em> Nausées, vomissements, diarrhées massives, tremblements intenses, ataxie (troubles de la marche), dysarthrie (troubles de la parole), confusion.<br><br>
+        <strong>Digoxine :</strong> Zone thérapeutique (0.7 - 2.0 ng/mL).<br>
+        <em>Signes d'intoxication :</em> Troubles visuels (dyschromatopsie en vision jaune/verte), bradycardie sévère (< 50 bpm), troubles du rythme, nausées et vomissements. Contrôler la kaliémie (l'hypokaliémie majore la toxicité).
+      </div>
+
+      <h3>3. Formules de Calcul de Débit par Gravité (Perfusion)</h3>
+      <p>Formule standard (avec un perfuseur standard délivrant <strong>20 gouttes = 1 mL</strong>) :</p>
+      <div style="background:#f8fafc; padding:12px; border-radius:6px; font-family:monospace; margin:10px 0;">
+        Débit (gouttes / minute) = [ Volume total en mL × 20 ] / [ Temps total en minutes ]
+      </div>
+      <p><em>Exemple :</em> 1000 mL de G5% à passer en 8 heures (soit 480 minutes) $\rightarrow (1000 \times 20) / 480 = 20000 / 480 \approx 42$ gouttes/minute.</p>
+    `,
+
+    pediatrie: `
+      <h2> Pédiatrie & Néonatologie (Intégral)</h2>
+      
+      <h3>1. Bronchiolite Aiguë du Nourrisson</h3>
+      <p>Affection respiratoire virale aiguë très fréquente chez le nourrisson de moins de 2 ans (principalement due au Virus Respiratoire Syncytial - VRS), touchant les bronchioles terminales.</p>
+      <ul>
+        <li><strong>Signes cliniques d'alerte :</strong> Rhinopharyngite initiale suivie d'une toux, d'une polypnée superficielle et de sibilants expiratoires audibles.</li>
+        <li><strong>Signes d'épuisement respiratoire (Critères d'hospitalisation urgente) :</strong>
+          <ul>
+            <li>Tirage intercostal et sous-costal marqués, entonnoir xiphoïdien.</li>
+            <li>Balancement thoraco-abdominal (mouvement paradoxal de l'abdomen).</li>
+            <li>Battement des ailes du nez, cyanose péribuccale.</li>
+            <li>Pauses respiratoires (apnées) et bradycardie, traduisant l'épuisement imminent des muscles respiratoires.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>2. Évaluation de la Déshydratation Aiguë & Règle de Holliday-Segar (Besoins Hydriques)</h3>
+      <p>Calcul des besoins hydriques journaliers de maintenance chez l'enfant en bonne santé :</p>
+      <ul>
+        <li>Pour les premiers 10 kg de poids : <strong>100 mL / kg / jour</strong></li>
+        <li>Pour la tranche de poids entre 10 kg et 20 kg : ajouter <strong>50 mL / kg / jour</strong> par kilo supplémentaire au-delà de 10 kg.</li>
+        <li>Pour chaque kilo au-delà de 20 kg : ajouter <strong>20 mL / kg / jour</strong>.</li>
+      </ul>
+      <div class="alert-box">
+        <em>Exemple pour un enfant de 14 kg :</em><br>
+        10 premiers kilos = $10 \times 100 = 1000\text{ mL}$<br>
+        4 kilos restants (de 10 à 14 kg) = $4 \times 50 = 200\text{ mL}$<br>
+        <strong>Total des besoins journaliers :</strong> $1000 + 200 = 1200\text{ mL / 24h}$ (soit 50 mL/h).
+      </div>
+    `,
+
+    legislation: `
+      <h2> Législation Israélienne : Chok Zkhouyot HaChole (Intégral)</h2>
+      
+      <h3>1. La Loi sur les Droits du Patient (חוק זכויות החולה, התשנ\"ו-1996)</h3>
+      <p>Cette loi fondamentale encadre l'exercice de la profession infirmière et médicale en Israël en garantissant la dignité, l'autonomie et les droits de toute personne recevant des soins.</p>
+      
+      <h3>2. Le Consentement Éclairé (הجحמה מדעת)</h3>
+      <p>Aucun traitement médical ne peut être prodigué sans le consentement libre et éclairé du patient. Pour être valide, le patient doit avoir reçu du médecin ou de l'infirmière autorisée les informations claires concernant :</p>
+      <ul>
+        <li>Le diagnostic et la nature de l'intervention proposée.</li>
+        <li>Les objectifs, les bénéfices attendus et les risques potentiels (effets secondaires, complications).</li>
+        <li>Les alternatives thérapeutiques envisageables, y compris l'absence de traitement.</li>
+      </ul>
+      <div class="alert-box">
+        <strong>Exceptions légales majeures au consentement éclairé :</strong>
+        <p>En cas d'<strong>urgence vitale immédiate</strong>, lorsqu'un patient se trouve dans une situation de danger de mort imminent ou de préjudice irréversible grave, et qu'il est inconscient ou hors d'état d'exprimer sa volonté (et en l'absence de représentant légal immédiat), les soins de survie indispensables sont prodigués sans délai, sans qu'il soit nécessaire d'obtenir un consentement écrit.</p>
+      </div>
+
+      <h3>3. Secret Professionnel et Partage des Données</h3>
+      <p>Le personnel soignant est tenu au secret absolu. Le partage d'informations médicales concernant un patient n'est autorisé qu'entre les membres de l'équipe multidisciplinaire directement impliqués dans la prise en charge thérapeutique de ce patient au sein de l'établissement.</p>
+    `,
+
+    psychiatrie: `
+      <h2> Psychiatrie & Soins en Santé Mentale (Intégral)</h2>
+      
+      <h3>1. Le Syndrome Malin des Neuroleptiques (SMN)</h3>
+      <p>Urgence médicale et psychiatrique vitale consécutive à l'administration de médicaments antipsychotiques (neuroleptiques bloquant les récepteurs dopaminergiques).</p>
+      <p><strong>Tétrade symptomatique caractéristique :</strong></p>
+      <ul>
+        <li><strong>Hyperthermie maligne extrême :</strong> Température corporelle dépassant fréquemment 39°C à 40°C.</li>
+        <li><strong>Rigidité musculaire intense :</strong> Dite "en tuyau de poêle" ou "en roue dentée", généralisée à tout le corps.</li>
+        <li><strong>Instabilité végétative :</strong> Labilité tensionnelle importante, tachycardie, tachypnée, sueurs profuses (diaphorèse).</li>
+        <li><strong>Troubles de la conscience :</strong> Allant de la confusion mentale modérée à la catatonie et au coma profond.</li>
+      </ul>
+      <div class="alert-box">
+        <strong>Conduite à tenir infirmière d'urgence :</strong>
+        <ol>
+          <li>Arrêt immédiat et définitif de tout traitement neuroleptique.</li>
+          <li>Alerte médicale immédiate et préparation du transfert en unité de soins intensifs (réanimation).</li>
+          <li>Mesures physiques de refroidissement externe (vessies de glace, couvertures hypothermiques).</li>
+          <li>Correction des désordres hydro-électrolytiques et monitorage hémodynamique strict.</li>
+        </ol>
+      </div>
+
+      <h3>2. Protocoles de Contention Physique en Psychiatrie</h3>
+      <p>La contention physique (attaches aux poignets/chevilles) constitue une mesure d'exception absolue, utilisée uniquement en dernier recours lorsque le patient met sa propre vie en danger ou celle autrui (violence aiguë réfractaire aux mesures verbales et médicamenteuses).</p>
+      <ul>
+        <li><strong>Règles réglementaires strictes :</strong> Prescription médicale écrite obligatoire, durée limitée dans le temps, renouvellement encadré par les textes de santé mentale israéliens, et surveillance infirmière continue (vérification des points de pression, de la coloration des extrémités, hydratation et réévaluation clinique fréquente).</li>
+      </ul>
+    `
+  };
+
+  function openFiche(key) {
+    const content = fichesData[key];
+    if(content) {
+      document.getElementById('ficheContent').innerHTML = content;
+      document.getElementById('ficheModal').style.display = 'flex';
+    }
+  }
+
+  function closeFiche() {
+    document.getElementById('ficheModal').style.display = 'none';
+  }
+
+  function closeModalOnOverlay(event) {
+    if(event.target.id === 'ficheModal') {
+      closeFiche();
+    }
+  }
+</script>
+
+</body>
+</html>

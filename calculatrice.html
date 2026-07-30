@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculette Posologies & Débits - Preparation Rishuy</title>
+  <style>
+    :root {
+      --primary: #1b2a47;
+      --accent: #0f4c81;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 6px; }
+    header p { opacity: 0.85; margin-bottom: 25px; }
+
+    .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); }
+    .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+    .container { max-width: 800px; margin: 30px auto 0; padding: 0 20px; }
+    .calc-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid var(--border); }
+    .calc-title { font-size: 1.2rem; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
+    
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+    input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; }
+    
+    button.btn-calc { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    button.btn-calc:hover { background: #0b3861; }
+    
+    .result { margin-top: 15px; padding: 15px; background: #eaf2f8; border-left: 4px solid var(--accent); border-radius: 4px; font-weight: bold; font-size: 1.1rem; text-align: center; color: var(--primary); display: none; }
+    
+    @media (max-width: 768px) { .main-nav { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>CALCULETTE DE POSOLOGIES</h1>
+  <p>Outils de calcul rapide pour perfusions et dosages pédiatriques/adultes</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab active">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab">🧠 Quiz d'Entraînement</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- Calcul Débit Gouttes/Min -->
+  <div class="calc-card">
+    <h2 class="calc-title">1. Calcul de Débit de Perfusion (Gouttes / min)</h2>
+    <div class="form-group">
+      <label>Volume total (mL) :</label>
+      <input type="number" id="volGtt" placeholder="Ex: 1000">
+    </div>
+    <div class="form-group">
+      <label>Durée de perfusion (heures) :</label>
+      <input type="number" id="durGtt" placeholder="Ex: 8">
+    </div>
+    <div class="form-group">
+      <label>Type de tubulure :</label>
+      <select id="typeTub">
+        <option value="20">Standard Standard (1 mL = 20 gouttes)</option>
+        <option value="60">Pédiatrique / Microgouttes (1 mL = 60 gouttes)</option>
+        <option value="10">Transfusion Sanguine (1 mL = 10 gouttes)</option>
+      </select>
+    </div>
+    <button class="btn-calc" onclick="calcGouttes()">Calculer le débit</button>
+    <div id="resGtt" class="result"></div>
+  </div>
+
+  <!-- Calcul Seringue Électrique / Pousse-Seringue -->
+  <div class="calc-card">
+    <h2 class="calc-title">2. Vitesse de Pousse-Seringue (mL / h)</h2>
+    <div class="form-group">
+      <label>Dose prescrite (mg/h ou µg/kg/min) :</label>
+      <input type="number" id="dosePres" placeholder="Ex: 5">
+    </div>
+    <div class="form-group">
+      <label>Concentration de la seringue (mg total dans la seringue) :</label>
+      <input type="number" id="concMg" placeholder="Ex: 50">
+    </div>
+    <div class="form-group">
+      <label>Volume total de la seringue (mL) :</label>
+      <input type="number" id="volSeringue" value="50">
+    </div>
+    <button class="btn-calc" onclick="calcPSE()">Calculer la vitesse (mL/h)</button>
+    <div id="resPSE" class="result"></div>
+  </div>
+
+</div>
+
+<script>
+  function calcGouttes() {
+    const vol = parseFloat(document.getElementById('volGtt').value);
+    const dur = parseFloat(document.getElementById('durGtt').value);
+    const factor = parseFloat(document.getElementById('typeTub').value);
+
+    if(!vol || !dur || dur <= 0) {
+      alert("Veuillez remplir correctement le volume et la durée.");
+      return;
+    }
+
+    const min = dur * 60;
+    const gttMin = Math.round((vol * factor) / min);
+
+    const res = document.getElementById('resGtt');
+    res.style.display = 'block';
+    res.innerHTML = `Débit recommandé : <strong>${gttMin} gouttes / min</strong>`;
+  }
+
+  calcPSE = function() {
+    const dose = parseFloat(document.getElementById('dosePres').value);
+    const conc = parseFloat(document.getElementById('concMg').value);
+    const vol = parseFloat(document.getElementById('volSeringue').value);
+
+    if(!dose || !conc || !vol) {
+      alert("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    // Calcul mL/h simple : (Dose prescrite mg/h) / (Concentration mg/mL)
+    const mgPerMl = conc / vol;
+    const mlH = (dose / mgPerMl).toFixed(1);
+
+    const res = document.getElementById('resPSE');
+    res.style.display = 'block';
+    res.innerHTML = `Vitesse à régler : <strong>${mlH} mL / h</strong>`;
+  }
+</script>
+
+</body>
+</html>

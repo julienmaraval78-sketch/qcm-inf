@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz d'Entraînement - Preparation Rishuy</title>
+  <style>
+    :root {
+      --primary: #1b2a47;
+      --accent: #0f4c81;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #e2e8f0;
+      --success: #2ecc71;
+      --error: #e74c3c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 6px; }
+    header p { opacity: 0.85; margin-bottom: 25px; }
+
+    .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); }
+    .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+    .container { max-width: 750px; margin: 30px auto 0; padding: 0 20px; }
+    .quiz-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    
+    .question-num { font-size: 0.85rem; font-weight: bold; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+    .question-text { font-size: 1.15rem; font-weight: bold; color: var(--primary); margin-bottom: 20px; }
+
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .option-btn { padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff; text-align: left; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+    .option-btn:hover { background: #f0f4f8; }
+    .option-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; font-weight: bold; }
+    .option-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+
+    .explanation { padding: 15px; background: #eaf2f8; border-radius: 6px; margin-bottom: 20px; display: none; font-size: 0.9rem; }
+    
+    .next-btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; float: right; display: none; }
+
+    @media (max-width: 768px) { .main-nav { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>QUIZ D'ENTRAÎNEMENT RISHUY</h1>
+  <p>Testez vos connaissances sur des questions de type examen d'État</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab active">🧠 Quiz d'Entraînement</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="quiz-card" id="quizContainer">
+    <div class="question-num" id="qNum">Question 1 / 3</div>
+    <div class="question-text" id="qText">Chargement de la question...</div>
+
+    <div class="options" id="optionsContainer"></div>
+
+    <div class="explanation" id="expBox"></div>
+
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question Suivante →</button>
+    <div style="clear:both;"></div>
+  </div>
+
+</div>
+
+<script>
+  const questions = [
+    {
+      q: "Quel est le traitement de première intention recommandé lors de la prise en charge immédiate d'une crise de prééclampsie sévère avec convulsions (éclampsie) ?",
+      options: [
+        "Lovenox IV",
+        "Sulfate de Magnésium IV",
+        "Paracétamol PO",
+        "Insuline Rapide SC"
+      ],
+      correct: 1,
+      exp: "Le Sulfate de Magnésium (MgSO4) est le traitement de choix pour prévenir et traiter les crises d'éclampsie."
+    },
+    {
+      q: "Avant d'administrer une transfusion de culot globulaire, quelle est l'action de sécurité ultime à effectuer impérativement au lit du patient ?",
+      options: [
+        "Vérifier la tension artérielle 1h après",
+        "Contrôle ultime de concordance ABO au lit du patient (Bedside test)",
+        "Demander un bilan rénal complet",
+        "Chauffer le culot globulaire au micro-ondes"
+      ],
+      correct: 1,
+      exp: "Le contrôle ultime au lit du patient (compatibilité ABO et identitovigilance) est obligatoire immédiatement avant de démarrer la transfusion."
+    },
+    {
+      q: "Un nourrisson présente une fièvre à 38.8°C avec un score d'Apgar à 9 à la naissance. Quel est le dosage pédiatrique standard de Paracétamol ?",
+      options: [
+        "15 mg / kg par prise toutes les 4 à 6 heures",
+        "50 mg / kg par prise",
+        "100 mg / kg par jour en une seule fois",
+        "5 mg / kg par jour"
+      ],
+      correct: 0,
+      exp: "La posologie usuelle du paracétamol chez l'enfant est de 15 mg/kg par prise, jusqu'à 4 fois par jour (max 60 mg/kg/jour)."
+    }
+  ];
+
+  let currentQ = 0;
+
+  function loadQuestion() {
+    const qData = questions[currentQ];
+    document.getElementById('qNum').innerText = `Question ${currentQ + 1} / ${questions.length}`;
+    document.getElementById('qText').innerText = qData.q;
+    
+    const optsContainer = document.getElementById('optionsContainer');
+    optsContainer.innerHTML = "";
+
+    document.getElementById('expBox').style.display = "none";
+    document.getElementById('nextBtn').style.display = "none";
+
+    qData.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = "option-btn";
+      btn.innerText = opt;
+      btn.onclick = () => selectOption(idx, qData.correct, qData.exp);
+      optsContainer.appendChild(btn);
+    });
+  }
+
+  function selectOption(selectedIdx, correctIdx, exp) {
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === correctIdx) {
+        btn.classList.add('correct');
+      } else if (idx === selectedIdx) {
+        btn.classList.add('wrong');
+      }
+    });
+
+    const expBox = document.getElementById('expBox');
+    expBox.innerHTML = `<strong>Explication :</strong> ${exp}`;
+    expBox.style.display = "block";
+
+    document.getElementById('nextBtn').style.display = "block";
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ < questions.length) {
+      loadQuestion();
+    } else {
+      document.getElementById('quizContainer').innerHTML = "<h2>🎉 Bravo ! Vous avez terminé ce module d'entraînement.</h2><p style='margin-top:15px;'><a href='index.html'>Retourner aux fiches de révision</a></p>";
+    }
+  }
+
+  // Initialisation
+  loadQuestion();
+</script>
+
+</body>
+</html>

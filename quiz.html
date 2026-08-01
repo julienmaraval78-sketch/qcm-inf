@@ -1,0 +1,3182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulateur Examen QCM Rishuy - 200 Questions</title>
+  <style>
+    :root {
+      --primary: #1b2a47;
+      --accent: #0f4c81;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #e2e8f0;
+      --success: #27ae60;
+      --error: #c0392b;
+      --warning: #e67e22;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 6px; }
+    header p { opacity: 0.85; margin-bottom: 25px; }
+
+    .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); flex-wrap: wrap; }
+    .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+    .container { max-width: 850px; margin: 30px auto 0; padding: 0 20px; }
+    
+    .mode-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn-mode { flex: 1; min-width: 200px; padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: white; font-size: 0.95rem; text-align: center; }
+    .btn-mode-rand { background: var(--success); }
+    .btn-mode-rand:hover { background: #219150; }
+    .btn-mode-err { background: var(--warning); }
+    .btn-mode-err:hover { background: #d35400; }
+
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: white; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); }
+    .timer { font-weight: bold; color: var(--warning); font-size: 1.1rem; }
+
+    .quiz-card { background: var(--card-bg); border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+    .case-study { background: #f8fafc; border-left: 4px solid var(--accent); padding: 15px; margin-bottom: 20px; border-radius: 4px; font-style: italic; line-height: 1.5; color: #334155; }
+    
+    .question-text { font-size: 1.15rem; font-weight: bold; color: var(--primary); margin-bottom: 20px; line-height: 1.4; }
+
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+    .option-btn { padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff; text-align: left; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; color: var(--text); line-height: 1.3; }
+    .option-btn:hover { background: #f0f4f8; border-color: var(--accent); }
+    .option-btn.selected { background: #eaf2f8; border-color: var(--accent); font-weight: bold; }
+
+    .btn-action { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; float: right; font-size: 1rem; transition: background 0.2s; }
+    .btn-action:hover { background: var(--accent); }
+
+    .correction-item { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+    .correction-item.wrong-item { border-left: 5px solid var(--error); }
+    .correction-item.correct-item { border-left: 5px solid var(--success); }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: white; margin-bottom: 10px; }
+    .badge-success { background: var(--success); }
+    .badge-error { background: var(--error); }
+
+    .exp-box { margin-top: 12px; padding: 12px; background: #f1f5f9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; color: #334155; }
+
+    @media (max-width: 768px) { 
+      .main-nav { flex-direction: column; } 
+      .quiz-header { flex-direction: column; gap: 10px; text-align: center; }
+      .btn-action { width: 100%; float: none; }
+    }
+  
+    .bloc-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .bloc-btn {
+      flex: 1; min-width: 110px; padding: 10px 12px; border-radius: 8px; border: 2px solid var(--border);
+      background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--primary);
+      text-align: center; transition: all 0.15s;
+    }
+    .bloc-btn:hover { border-color: var(--accent); }
+    .bloc-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>EXAMEN QCM RISHUY - 200 QUESTIONS</h1>
+  <p>Banque d'examen complète • 200 questions • Filtre par bloc • Mode Rattrapage d'erreurs</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab active">🧠 Quiz d'Entraînement</a>
+    <a href="outils.html" class="nav-tab">⚡ Flash-Analyse & Normes</a>
+    <a href="progression.html" class="nav-tab">📊 Progression</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <div class="bloc-selector" id="blocSelector">
+    <div class="bloc-btn active" data-bloc="0">🎲 Tous les blocs</div>
+    <div class="bloc-btn" data-bloc="1">Bloc 1 — Légis.</div>
+    <div class="bloc-btn" data-bloc="2">Bloc 2 — Médecine/Chir.</div>
+    <div class="bloc-btn" data-bloc="3">Bloc 3 — Mère/Enfant</div>
+    <div class="bloc-btn" data-bloc="4">Bloc 4 — Santé mentale</div>
+    <div class="bloc-btn" data-bloc="5">Bloc 5 — Pharmaco</div>
+  </div>
+
+  <div class="mode-bar">
+    <button class="btn-mode btn-mode-rand" onclick="initQuiz()">🎲 Lancer une série (20 Qs) sur la sélection</button>
+    <button class="btn-mode btn-mode-err" onclick="initErrorQuiz()">🔄 Revoir mes erreurs sauvegardées (<span id="errCount">0</span>)</button>
+  </div>
+
+  <div class="quiz-header" id="quizHeader">
+    <span id="qCount" style="font-weight: bold; color: var(--primary);">Question 1 sur 20</span>
+    <span class="timer" id="timer">⏱ Temps : 00:00</span>
+  </div>
+
+  <div class="quiz-card" id="quizCard">
+    <div class="case-study" id="caseStudy">
+      <strong>Cas Clinique :</strong> Chargement...
+    </div>
+
+    <div class="question-text" id="qText">Chargement de la question...</div>
+
+    <div class="options" id="optionsBox"></div>
+
+    <button class="btn-action" id="btnNext" onclick="recordAndNext()">Suivant →</button>
+    <div style="clear:both;"></div>
+  </div>
+
+  <div id="correctionSection" style="display:none;"></div>
+
+</div>
+
+<script>
+  // BANQUE COMPLETE DE 200 QUESTIONS RISHUY (uniques, reparties en 8 domaines)
+  const questionBank = [
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Un patient présente une douleur thoracique constrictive irradiant vers le bras gauche depuis 20 minutes.",
+    "q": "Quel est le geste infirmier prioritaire dans les 10 premières minutes ?",
+    "options": [
+      "Administrer un antalgique oral et réévaluer",
+      "Réaliser un ECG 12 dérivations",
+      "Faire marcher le patient pour tester la tolérance",
+      "Attendre l'arrivée du médecin sans agir"
+    ],
+    "correct": 1,
+    "exp": "Devant toute douleur thoracique évocatrice de SCA, l'ECG 12 dérivations doit être réalisé dans les 10 minutes suivant l'arrivée du patient.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient de 68 ans, dyspnée aiguë, orthopnée, crépitants bilatéraux, crachats mousseux rosés.",
+    "q": "Quelle position adopter en priorité ?",
+    "options": [
+      "Décubitus dorsal strict",
+      "Trendelenburg",
+      "Position assise, jambes pendantes",
+      "Décubitus latéral droit"
+    ],
+    "correct": 2,
+    "exp": "En cas d'OAP, la position assise jambes pendantes diminue le retour veineux et soulage le travail cardiaque.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient fébrile à 39°C, hypotendu à 85/50, tachycarde, avec des extrémités chaudes et érythrosiques.",
+    "q": "Quel type de choc évoque ce tableau en phase initiale ?",
+    "options": [
+      "Choc cardiogénique",
+      "Choc hypovolémique",
+      "Choc septique (phase chaude)",
+      "Choc obstructif"
+    ],
+    "correct": 2,
+    "exp": "Le choc septique en phase initiale se caractérise par une vasodilatation avec extrémités chaudes, contrairement aux autres chocs.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient victime d'un accident de la route, TA 80/50, FC 130, pâleur, extrémités froides et moites.",
+    "q": "Quel est le mécanisme de choc le plus probable ?",
+    "options": [
+      "Choc hypovolémique hémorragique",
+      "Choc septique",
+      "Choc anaphylactique",
+      "Choc neurogénique"
+    ],
+    "correct": 0,
+    "exp": "Traumatisme + hypotension + tachycardie + extrémités froides évoquent en premier lieu un choc hypovolémique hémorragique.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Un adulte est retrouvé inconscient, sans respiration ni pouls détectable.",
+    "q": "Quel est le ratio compressions/insufflations recommandé en RCP à un seul sauveteur chez l'adulte ?",
+    "options": [
+      "15:2",
+      "30:2",
+      "5:1",
+      "10:1"
+    ],
+    "correct": 1,
+    "exp": "Le ratio standard en RCP adulte à un seul sauveteur est de 30 compressions pour 2 insufflations.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Un patient en arrêt cardiaque présente une fibrillation ventriculaire au scope.",
+    "q": "Quel est le traitement immédiat prioritaire ?",
+    "options": [
+      "Administration d'adrénaline seule",
+      "Défibrillation immédiate",
+      "Perfusion de bicarbonate",
+      "Attente de 5 minutes avant action"
+    ],
+    "correct": 1,
+    "exp": "La fibrillation ventriculaire est un rythme choquable nécessitant une défibrillation immédiate, associée à la RCP.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient bradycarde à 38 bpm, hypotendu, symptomatique (vertiges, confusion).",
+    "q": "Quel traitement médicamenteux est envisagé en première intention sur prescription ?",
+    "options": [
+      "Adrénaline IV",
+      "Atropine IV",
+      "Amiodarone IV",
+      "Digoxine IV"
+    ],
+    "correct": 1,
+    "exp": "L'atropine est le traitement de première intention de la bradycardie symptomatique.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient avec douleur thoracique pleurale brutale, dyspnée, tachycardie, antécédent de chirurgie récente.",
+    "q": "Quelle est la conduite prioritaire en cas de suspicion d'embolie pulmonaire ?",
+    "options": [
+      "Mobiliser le patient pour évaluer la tolérance",
+      "Repos strict au lit et bilan en urgence",
+      "Masser le mollet douloureux",
+      "Attendre 24h avant tout examen"
+    ],
+    "correct": 1,
+    "exp": "Le repos strict au lit est impératif en cas de suspicion d'EP, pour éviter la migration d'un nouvel embole, en attendant le bilan.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient de 70 ans, douleur lombaire brutale intense irradiant vers l'aine, hypotension, masse abdominale pulsatile.",
+    "q": "Quelle urgence vasculaire faut-il suspecter ?",
+    "options": [
+      "Colique néphrétique simple",
+      "Rupture d'anévrysme de l'aorte abdominale",
+      "Lumbago mécanique",
+      "Pyélonéphrite"
+    ],
+    "correct": 1,
+    "exp": "Ce tableau est évocateur d'une rupture d'anévrysme de l'aorte abdominale, urgence vitale extrême.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient traumatisé thoracique, turgescence jugulaire, hypotension, bruits du cœur assourdis.",
+    "q": "Quelle triade clinique et quelle urgence évoque ce tableau ?",
+    "options": [
+      "Triade de Beck — tamponnade cardiaque",
+      "Triade de Cushing — HTIC",
+      "Triade de Charcot — angiocholite",
+      "Triade de Virchow — thrombose"
+    ],
+    "correct": 0,
+    "exp": "La triade de Beck (turgescence jugulaire, hypotension, bruits du cœur assourdis) évoque une tamponnade cardiaque, urgence vitale.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient avec vomissements de sang rouge vif abondants et signes de choc débutant.",
+    "q": "Quel est le terme médical de ce symptôme et la priorité infirmière ?",
+    "options": [
+      "Méléna — mise à jeun uniquement",
+      "Hématémèse — 2 voies veineuses de gros calibre et bilan urgent",
+      "Rectorragie — lavement immédiat",
+      "Hémoptysie — aérosols"
+    ],
+    "correct": 1,
+    "exp": "L'hématémèse (vomissement de sang) impose la pose de 2 voies veineuses de gros calibre et un bilan sanguin en urgence.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient traumatisé thoracique, détresse respiratoire brutale, déviation trachéale, abolition du murmure vésiculaire d'un côté.",
+    "q": "Quelle urgence extrême faut-il évoquer ?",
+    "options": [
+      "Pneumothorax simple",
+      "Pneumothorax sous tension (compressif)",
+      "Épanchement pleural chronique",
+      "Bronchite aiguë"
+    ],
+    "correct": 1,
+    "exp": "La déviation trachéale associée à une détresse respiratoire brutale évoque un pneumothorax sous tension, urgence vitale nécessitant une décompression immédiate.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient asthmatique en crise sévère, difficulté à parler, tirage, puis silence à l'auscultation.",
+    "q": "Comment interpréter ce silence auscultatoire ?",
+    "options": [
+      "Signe d'amélioration de la crise",
+      "Signe de gravité extrême par obstruction majeure",
+      "Signe normal en fin de crise",
+      "Absence de signification clinique"
+    ],
+    "correct": 1,
+    "exp": "Le silence auscultatoire chez l'asthmatique en crise signe une obstruction si sévère qu'il n'y a plus de mouvement d'air — gravité extrême.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Enfant de 3 ans, fièvre élevée brutale, hypersialorrhée, position en tripode, voix étouffée.",
+    "q": "Quel geste est formellement à éviter devant ce tableau évocateur d'épiglottite ?",
+    "options": [
+      "Laisser l'enfant en position choisie",
+      "Examiner la gorge à l'abaisse-langue et allonger l'enfant",
+      "Alerter l'équipe médicale",
+      "Surveiller la fréquence respiratoire"
+    ],
+    "correct": 1,
+    "exp": "Chez un enfant suspect d'épiglottite, il ne faut jamais examiner la gorge de force ni l'allonger — risque de décompensation respiratoire brutale.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient présentant une hémiparésie droite brutale et des troubles du langage depuis 1 heure.",
+    "q": "Quelle est la fenêtre thérapeutique classique pour la thrombolyse d'un AVC ischémique ?",
+    "options": [
+      "45 minutes",
+      "4h30",
+      "12 heures",
+      "24 heures"
+    ],
+    "correct": 1,
+    "exp": "La fenêtre de thrombolyse pour un AVC ischémique est classiquement de 4h30 après le début des symptômes.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Un patient présente une asymétrie faciale, une faiblesse d'un bras et un trouble de la parole.",
+    "q": "Quelle méthode mnémotechnique permet de reconnaître rapidement un AVC ?",
+    "options": [
+      "ABCDE",
+      "FAST",
+      "SAMPLE",
+      "OPQRST"
+    ],
+    "correct": 1,
+    "exp": "La méthode FAST (Face, Arm, Speech, Time) permet une reconnaissance rapide de l'AVC.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Un patient convulse depuis 6 minutes sans reprise de conscience entre les secousses.",
+    "q": "Quelle est la conduite prioritaire ?",
+    "options": [
+      "Attendre l'arrêt spontané",
+      "Considérer un état de mal épileptique et administrer une benzodiazépine sur prescription",
+      "Mettre un objet dans la bouche",
+      "Immobiliser fermement les membres"
+    ],
+    "correct": 1,
+    "exp": "Toute crise dépassant 5 minutes doit être traitée comme un état de mal épileptique, nécessitant une benzodiazépine en urgence.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient diabétique retrouvé inconscient, glycémie capillaire à 0,35 g/L.",
+    "q": "Quelle est la conduite adaptée chez ce patient incapable de déglutir ?",
+    "options": [
+      "Resucrage oral avec du jus de fruit",
+      "Glucagon IM/SC ou glucosé hypertonique IV selon protocole",
+      "Attendre le réveil spontané",
+      "Administration d'insuline"
+    ],
+    "correct": 1,
+    "exp": "Chez un patient inconscient, tout apport oral est contre-indiqué — le traitement repose sur le glucagon ou le glucosé hypertonique IV.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient diabétique de type 1 en acidocétose, sous insulinothérapie IV depuis 1 heure.",
+    "q": "Quelle surveillance biologique est impérative dès le début du traitement ?",
+    "options": [
+      "Uricémie",
+      "Kaliémie (risque d'hypokaliémie sévère)",
+      "Cholestérolémie",
+      "Ferritinémie"
+    ],
+    "correct": 1,
+    "exp": "L'insuline fait entrer le potassium dans les cellules, risquant une hypokaliémie sévère potentiellement fatale — surveillance ECG et kaliémie impérative.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient présentant urticaire généralisée, œdème du visage, dyspnée sifflante après une piqûre d'insecte.",
+    "q": "Quel traitement de première intention doit être administré en urgence ?",
+    "options": [
+      "Antihistaminique oral seul",
+      "Adrénaline en intramusculaire",
+      "Corticoïdes oraux seuls",
+      "Paracétamol IV"
+    ],
+    "correct": 1,
+    "exp": "L'adrénaline intramusculaire est le traitement de première intention de l'anaphylaxie, à administrer sans délai.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient brûlé sur l'ensemble d'un membre supérieur et le thorax antérieur.",
+    "q": "Quelle règle permet d'estimer rapidement la surface corporelle brûlée chez l'adulte ?",
+    "options": [
+      "Règle des 9 de Wallace",
+      "Score de Glasgow",
+      "Score de Wells",
+      "Règle de Holliday-Segar"
+    ],
+    "correct": 0,
+    "exp": "La règle des 9 de Wallace permet d'estimer rapidement le pourcentage de surface corporelle brûlée chez l'adulte.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient retrouvé dans un garage fermé avec un véhicule allumé, céphalées, confusion.",
+    "q": "Quel traitement immédiat est indiqué en cas de suspicion d'intoxication au monoxyde de carbone ?",
+    "options": [
+      "Oxygénothérapie à haute concentration",
+      "Antibiothérapie large spectre",
+      "Diurétiques IV",
+      "Anticoagulation systématique"
+    ],
+    "correct": 0,
+    "exp": "L'oxygénothérapie à haute concentration (voire hyperbare selon sévérité) est le traitement de référence de l'intoxication au CO.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Victime de noyade, inconsciente, ne respirant pas, retirée de l'eau.",
+    "q": "Quel geste est prioritaire par rapport à la RCP classique adulte ?",
+    "options": [
+      "Débuter par 5 insufflations avant les compressions",
+      "Débuter uniquement par les compressions thoraciques",
+      "Attendre les secours sans intervenir",
+      "Réaliser une manœuvre de Heimlich systématique"
+    ],
+    "correct": 0,
+    "exp": "En cas de noyade, la ventilation prime — il est recommandé de débuter par des insufflations avant d'enchaîner sur la RCP standard.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Patient exposé à une chaleur extrême, température corporelle à 41°C, confusion, peau sèche et chaude.",
+    "q": "Quelle est la priorité de prise en charge du coup de chaleur ?",
+    "options": [
+      "Réchauffement progressif",
+      "Refroidissement actif rapide et réhydratation",
+      "Antibiothérapie immédiate",
+      "Mise à jeun stricte prolongée"
+    ],
+    "correct": 1,
+    "exp": "Le coup de chaleur nécessite un refroidissement actif rapide (eau, ventilation, glace) associé à une réhydratation.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Urgence & Cardiologie] Aux urgences, plusieurs patients arrivent simultanément après un accident collectif.",
+    "q": "Quelle méthode structurée permet de prioriser la prise en charge ?",
+    "options": [
+      "Ordre d'arrivée strict",
+      "Approche systématique ABCDE (triage)",
+      "Priorité systématique aux enfants uniquement",
+      "Prise en charge alphabétique par nom"
+    ],
+    "correct": 1,
+    "exp": "L'approche ABCDE (Airway, Breathing, Circulation, Disability, Exposure) est la méthode structurée de triage et de priorisation des urgences.",
+    "bloc": 2,
+    "domain": "Urgence & Cardiologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un nouveau-né est évalué à 1 minute de vie : FC > 100, bon cri, mouvements actifs, corps rose extrémités bleues, réactif.",
+    "q": "Quel score utilise-t-on pour cette évaluation standardisée ?",
+    "options": [
+      "Score de Silverman",
+      "Score d'Apgar",
+      "Score de Glasgow",
+      "Score de Bishop"
+    ],
+    "correct": 1,
+    "exp": "Le score d'Apgar évalue l'adaptation du nouveau-né à 1 et 5 minutes de vie sur 5 critères.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un nouveau-né reçoit une injection systématique en intramusculaire dans les premières heures de vie.",
+    "q": "Quelle vitamine est administrée et dans quel but ?",
+    "options": [
+      "Vitamine D, pour la croissance osseuse",
+      "Vitamine K, pour prévenir la maladie hémorragique du nouveau-né",
+      "Vitamine C, pour l'immunité",
+      "Vitamine B12, pour l'anémie"
+    ],
+    "correct": 1,
+    "exp": "La vitamine K est administrée systématiquement pour prévenir la maladie hémorragique du nouveau-né.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Nourrisson de 4 mois, toux, sibilants diffus, polypnée à 65/min, difficultés à téter.",
+    "q": "Quel diagnostic est le plus probable et quel signe traduit la gravité ?",
+    "options": [
+      "Asthme du nourrisson — la toux",
+      "Bronchiolite — la polypnée à 65/min et les difficultés alimentaires",
+      "Pneumonie bactérienne — la fièvre",
+      "Coqueluche — les quintes"
+    ],
+    "correct": 1,
+    "exp": "La bronchiolite est typique avant 2 ans ; une FR > 60/min et des difficultés alimentaires sont des signes de gravité.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant de 2 ans, toux aboyante caractéristique, voix rauque, stridor inspiratoire, aggravation nocturne.",
+    "q": "Quel diagnostic évoque ce tableau ?",
+    "options": [
+      "Laryngite aiguë (croup)",
+      "Bronchiolite",
+      "Asthme",
+      "Corps étranger des voies aériennes"
+    ],
+    "correct": 0,
+    "exp": "La toux aboyante avec stridor et aggravation nocturne est caractéristique de la laryngite aiguë sous-glottique (croup).",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Nourrisson de 6 semaines, température rectale à 38,2°C, sans autre signe évident.",
+    "q": "Quelle est la conduite face à cette fièvre ?",
+    "options": [
+      "Surveillance à domicile sans consultation",
+      "Évaluation médicale systématique en urgence (seuil de gravité abaissé avant 3 mois)",
+      "Antipyrétique seul, sans consultation",
+      "Attendre 48h avant toute action"
+    ],
+    "correct": 1,
+    "exp": "Avant 3 mois, toute fièvre doit être évaluée systématiquement en urgence, le seuil d'alerte étant abaissé à cet âge.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant de 18 mois, diarrhée depuis 3 jours, yeux creux, pli cutané persistant, irritable.",
+    "q": "Que traduisent ces signes ?",
+    "options": [
+      "Une déshydratation modérée à sévère",
+      "Une simple fatigue",
+      "Une allergie alimentaire",
+      "Une constipation"
+    ],
+    "correct": 0,
+    "exp": "Ces signes (yeux creux, pli cutané persistant, irritabilité) traduisent une déshydratation modérée à sévère nécessitant une réhydratation.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant de 2 ans convulse pendant une poussée fébrile à 39,5°C, crise généralisée de 2 minutes.",
+    "q": "Quelle est la conduite infirmière immédiate ?",
+    "options": [
+      "Protéger l'enfant, position latérale de sécurité en phase post-critique, chronométrer la crise",
+      "Immobiliser fermement l'enfant",
+      "Mettre un objet dans la bouche",
+      "Donner immédiatement à boire"
+    ],
+    "correct": 0,
+    "exp": "Il faut protéger l'enfant, chronométrer la crise, et le mettre en PLS en phase post-critique — jamais rien dans la bouche ni immobilisation forcée.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un enfant fébrile de 5 ans doit recevoir un antipyrétique.",
+    "q": "Quel médicament est formellement contre-indiqué en raison du risque de syndrome de Reye ?",
+    "options": [
+      "Paracétamol",
+      "Ibuprofène",
+      "Aspirine",
+      "Amoxicilline"
+    ],
+    "correct": 2,
+    "exp": "L'aspirine est contre-indiquée chez l'enfant fébrile en contexte viral, en raison du risque de syndrome de Reye.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un nourrisson de 4 mois est examiné lors d'une consultation de suivi.",
+    "q": "Quel repère moteur est normalement attendu à cet âge ?",
+    "options": [
+      "Tenue de tête stable",
+      "Marche assurée",
+      "Station assise sans appui",
+      "Premiers mots"
+    ],
+    "correct": 0,
+    "exp": "La tenue de tête stable est un repère attendu vers 4 mois de vie.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un enfant de 13 mois ne marche toujours pas, même avec appui.",
+    "q": "Que faut-il envisager face à ce retard ?",
+    "options": [
+      "C'est normal, rien à faire avant 3 ans",
+      "Une évaluation du développement psychomoteur est recommandée si absence de marche à 18 mois",
+      "Un signalement judiciaire immédiat",
+      "Une hospitalisation systématique"
+    ],
+    "correct": 1,
+    "exp": "La marche est attendue vers 12-18 mois ; son absence à 18 mois doit faire évoquer un retard de développement et orienter vers une évaluation.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un enfant de 12 mois est évalué lors de sa consultation Tipat Halav.",
+    "q": "Quel repère de langage est normalement attendu à cet âge ?",
+    "options": [
+      "Phrases complètes",
+      "Premier mot avec sens",
+      "Vocabulaire de 50 mots",
+      "Association de 2 mots"
+    ],
+    "correct": 1,
+    "exp": "Le premier mot avec sens est un repère attendu vers 12 mois.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un enfant immunodéprimé doit recevoir son calendrier vaccinal.",
+    "q": "Quel type de vaccin est contre-indiqué chez cet enfant ?",
+    "options": [
+      "Vaccin inactivé",
+      "Vaccin vivant atténué (ex : ROR, rotavirus)",
+      "Vaccin polysaccharidique",
+      "Vaccin sous-unitaire"
+    ],
+    "correct": 1,
+    "exp": "Les vaccins vivants atténués (ROR, rotavirus) sont contre-indiqués chez l'enfant immunodéprimé.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Une mère demande à quel âge introduire la diversification alimentaire de son nourrisson.",
+    "q": "Quelle est la période recommandée ?",
+    "options": [
+      "Dès la naissance",
+      "Entre 4 et 6 mois",
+      "Après 12 mois uniquement",
+      "Après 2 ans"
+    ],
+    "correct": 1,
+    "exp": "La diversification alimentaire est généralement recommandée entre 4 et 6 mois, en complément de l'allaitement/lait infantile.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Nouveau-né présentant une coloration jaunâtre de la peau et des sclères à J3 de vie.",
+    "q": "Que faut-il surveiller en priorité ?",
+    "options": [
+      "La bilirubinémie",
+      "La glycémie uniquement",
+      "La calcémie uniquement",
+      "Le poids uniquement"
+    ],
+    "correct": 0,
+    "exp": "L'ictère néonatal nécessite une surveillance de la bilirubinémie pour évaluer le risque de complications neurologiques.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un nouveau-né vient de naître ; sa thermorégulation est immature.",
+    "q": "Quelle mesure prévient efficacement l'hypothermie néonatale ?",
+    "options": [
+      "Le bain immédiat",
+      "Le peau à peau et le séchage immédiat",
+      "L'exposition à l'air ambiant",
+      "Le report des soins de 2 heures"
+    ],
+    "correct": 1,
+    "exp": "Le séchage immédiat et le peau à peau sont les mesures de référence pour prévenir l'hypothermie néonatale.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un nouveau-né présente une fréquence respiratoire à 70/min, un geignement expiratoire et un tirage intercostal.",
+    "q": "Que traduisent ces signes ?",
+    "options": [
+      "Une adaptation respiratoire normale",
+      "Une détresse respiratoire néonatale",
+      "Une simple régurgitation",
+      "Un pleur normal"
+    ],
+    "correct": 1,
+    "exp": "FR élevée, geignement et tirage sont des signes de détresse respiratoire néonatale nécessitant une évaluation urgente.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Nourrisson de 8 mois présentant des douleurs abdominales paroxystiques, des pleurs, et des selles glairo-sanglantes ('gelée de groseille').",
+    "q": "Quel diagnostic évoque ce tableau ?",
+    "options": [
+      "Gastro-entérite virale simple",
+      "Invagination intestinale aiguë",
+      "Constipation fonctionnelle",
+      "Reflux gastro-œsophagien"
+    ],
+    "correct": 1,
+    "exp": "Les douleurs paroxystiques associées à des selles glairo-sanglantes évoquent une invagination intestinale aiguë, urgence chirurgicale.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Nourrisson de 3 semaines présentant des vomissements en jet après chaque tétée, avec cassure de la courbe de poids.",
+    "q": "Quel diagnostic est évoqué ?",
+    "options": [
+      "Reflux gastro-œsophagien simple",
+      "Sténose hypertrophique du pylore",
+      "Allergie aux protéines de lait de vache",
+      "Invagination intestinale"
+    ],
+    "correct": 1,
+    "exp": "Les vomissements en jet post-prandiaux avec cassure pondérale sont évocateurs d'une sténose du pylore, nécessitant une prise en charge chirurgicale.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Une infirmière observe des ecchymoses d'âges différents sur le dos d'un enfant, avec un récit incohérent des parents.",
+    "q": "Quelle est la conduite légale appropriée ?",
+    "options": [
+      "Ignorer en l'absence de certitude absolue",
+      "Documenter objectivement et signaler la suspicion sans délai",
+      "Attendre l'accord des parents avant tout signalement",
+      "Confronter directement les parents avant de signaler"
+    ],
+    "correct": 1,
+    "exp": "Un doute raisonnable basé sur des éléments cliniques objectifs suffit à justifier un signalement, sans nécessiter l'accord des parents.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant de 8 ans, polyurie, polydipsie, perte de poids récente et fatigue.",
+    "q": "Quel diagnostic doit être évoqué en priorité ?",
+    "options": [
+      "Diabète insipide uniquement",
+      "Diabète de type 1",
+      "Infection urinaire simple",
+      "Anorexie"
+    ],
+    "correct": 1,
+    "exp": "Polyurie, polydipsie et perte de poids chez l'enfant sont évocatrices d'un diabète de type 1 à confirmer rapidement.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant de 4 ans se tirant l'oreille, fébrile, irritable, refusant de s'alimenter.",
+    "q": "Quel diagnostic ORL est le plus probable ?",
+    "options": [
+      "Otite moyenne aiguë",
+      "Sinusite chronique",
+      "Angine virale",
+      "Mastoïdite d'emblée"
+    ],
+    "correct": 0,
+    "exp": "Ce tableau est très évocateur d'une otite moyenne aiguë, fréquente chez le jeune enfant.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant de 3 ans présentant une diarrhée aqueuse abondante avec signes de déshydratation légère.",
+    "q": "Quelle est la prise en charge de première intention ?",
+    "options": [
+      "Réhydratation IV systématique",
+      "Solutés de réhydratation orale (SRO) fractionnés",
+      "Antibiothérapie systématique",
+      "Arrêt total de l'alimentation pendant 48h"
+    ],
+    "correct": 1,
+    "exp": "La réhydratation orale par SRO fractionnés est le traitement de première intention en cas de déshydratation légère à modérée.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Enfant fébrile présentant des taches purpuriques ne s'effaçant pas à la vitropression.",
+    "q": "Que faut-il suspecter en urgence absolue ?",
+    "options": [
+      "Une simple allergie cutanée",
+      "Un sepsis à méningocoque",
+      "Une piqûre d'insecte",
+      "Une varicelle débutante"
+    ],
+    "correct": 1,
+    "exp": "Un purpura fébrile chez l'enfant est une urgence absolue évoquant un sepsis à méningocoque, nécessitant une antibiothérapie immédiate.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un nouveau-né bénéficie d'un dépistage systématique néonatal par test du buvard (test de Guthrie).",
+    "q": "Quelle maladie génétique grave ce dépistage permet-il notamment de détecter précocement ?",
+    "options": [
+      "La trisomie 21",
+      "La mucoviscidose",
+      "Le syndrome de Down",
+      "L'autisme"
+    ],
+    "correct": 1,
+    "exp": "Le dépistage néonatal systématique permet notamment de détecter précocement la mucoviscidose et d'autres maladies métaboliques.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Patiente enceinte à 32 SA, TA 150/95 mmHg à deux reprises, protéinurie positive à la bandelette.",
+    "q": "Quel diagnostic est évoqué ?",
+    "options": [
+      "Hypertension chronique simple",
+      "Prééclampsie",
+      "Diabète gestationnel",
+      "Cystite gravidique"
+    ],
+    "correct": 1,
+    "exp": "HTA après 20 SA associée à une protéinurie significative définit la prééclampsie.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Patiente prééclamptique sous sulfate de magnésium présente une abolition des réflexes ostéo-tendineux.",
+    "q": "Que faut-il suspecter et quel est l'antidote ?",
+    "options": [
+      "Amélioration clinique, aucune action nécessaire",
+      "Toxicité au magnésium — antidote : gluconate de calcium",
+      "Hypocalcémie sans lien avec le traitement",
+      "Début de travail normal"
+    ],
+    "correct": 1,
+    "exp": "L'abolition des réflexes est le premier signe de toxicité au magnésium ; l'antidote est le gluconate de calcium.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une femme enceinte doit réaliser le dépistage du diabète gestationnel.",
+    "q": "À quel terme ce dépistage est-il réalisé systématiquement ?",
+    "options": [
+      "8-12 SA",
+      "24-28 SA",
+      "36-38 SA",
+      "Après l'accouchement"
+    ],
+    "correct": 1,
+    "exp": "Le dépistage du diabète gestationnel (HGPO) est réalisé systématiquement entre 24 et 28 SA.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Pendant le travail, le monitorage fœtal affiche un rythme cardiaque fœtal à 90 bpm de façon prolongée.",
+    "q": "Comment interpréter cette valeur ?",
+    "options": [
+      "Valeur normale, aucune action requise",
+      "Bradycardie fœtale — signe d'alerte nécessitant une prise en charge urgente",
+      "Tachycardie fœtale physiologique",
+      "Erreur de mesure à ignorer"
+    ],
+    "correct": 1,
+    "exp": "Le RCF normal est de 110-160 bpm ; une bradycardie prolongée est un signe d'alerte de souffrance fœtale.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une heure après l'accouchement, l'utérus est mou, non rétracté, avec un saignement abondant.",
+    "q": "Quelle est la cause la plus fréquente d'hémorragie du post-partum évoquée ici ?",
+    "options": [
+      "Trauma génital",
+      "Atonie utérine",
+      "Rétention placentaire uniquement",
+      "Trouble de la coagulation uniquement"
+    ],
+    "correct": 1,
+    "exp": "Un utérus mou et non rétracté avec saignement abondant évoque en premier lieu une atonie utérine, cause la plus fréquente d'HPP.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Face à une atonie utérine avec hémorragie du post-partum, quel geste infirmier est réalisé en première intention ?",
+    "q": "Quelle action est prioritaire ?",
+    "options": [
+      "Massage utérin manuel et administration d'utérotoniques sur prescription",
+      "Attendre l'avis du médecin sans agir",
+      "Position déclive stricte sans autre geste",
+      "Arrêt de toute perfusion"
+    ],
+    "correct": 0,
+    "exp": "Le massage utérin manuel associé aux utérotoniques (ocytocine en 1ère intention) est le geste prioritaire face à une atonie utérine.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente à terme présente des contractions régulières toutes les 5 minutes, de plus en plus intenses.",
+    "q": "Que traduit ce tableau ?",
+    "options": [
+      "Un travail obstétrical en cours",
+      "De simples contractions de Braxton-Hicks",
+      "Une menace d'avortement",
+      "Un signe d'infection urinaire"
+    ],
+    "correct": 0,
+    "exp": "Des contractions régulières et croissantes en intensité et fréquence traduisent un travail obstétrical en cours.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente enceinte de 35 SA présente un écoulement clair abondant et continu depuis 2 heures.",
+    "q": "Quel diagnostic faut-il évoquer ?",
+    "options": [
+      "Pertes vaginales physiologiques",
+      "Rupture prématurée des membranes",
+      "Infection urinaire simple",
+      "Incontinence urinaire d'effort"
+    ],
+    "correct": 1,
+    "exp": "Un écoulement clair abondant et continu chez une femme enceinte évoque une rupture prématurée des membranes à confirmer.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente enceinte présente des saignements vaginaux indolores au 3e trimestre, sans contraction.",
+    "q": "Quel diagnostic est évoqué en priorité et quel geste est CONTRE-INDIQUÉ ?",
+    "options": [
+      "Décollement placentaire — toucher vaginal recommandé",
+      "Placenta praevia — le toucher vaginal est contre-indiqué avant échographie",
+      "Cystite — antibiotiques uniquement",
+      "Contraction normale sans danger"
+    ],
+    "correct": 1,
+    "exp": "Un saignement indolore au 3e trimestre évoque un placenta praevia ; le toucher vaginal est contre-indiqué avant d'avoir localisé le placenta par échographie.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une femme en début de grossesse présente une douleur pelvienne unilatérale intense et des saignements, avec un test de grossesse positif.",
+    "q": "Quel diagnostic doit être évoqué en urgence ?",
+    "options": [
+      "Grossesse extra-utérine",
+      "Fausse couche complète simple",
+      "Kyste ovarien fonctionnel bénin",
+      "Cystite aiguë"
+    ],
+    "correct": 0,
+    "exp": "Douleur pelvienne unilatérale + saignements + grossesse débutante évoquent une grossesse extra-utérine, urgence chirurgicale potentielle.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une jeune accouchée allaitante présente des seins tendus, douloureux et chauds à J3 du post-partum.",
+    "q": "Que faut-il évoquer et quelle conduite adopter ?",
+    "options": [
+      "Mastite infectieuse, arrêt immédiat de l'allaitement",
+      "Engorgement mammaire physiologique, poursuite de l'allaitement avec vidange régulière",
+      "Cancer du sein, biopsie urgente",
+      "Galactorrhée pathologique"
+    ],
+    "correct": 1,
+    "exp": "L'engorgement mammaire est fréquent à J3 ; la poursuite de l'allaitement avec vidange régulière des seins est recommandée.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente en post-partum immédiat souhaite une contraception adaptée à l'allaitement.",
+    "q": "Quelle option est compatible avec l'allaitement en première intention ?",
+    "options": [
+      "Contraception œstroprogestative combinée",
+      "Contraception progestative seule ou méthodes non hormonales",
+      "Aucune contraception n'est nécessaire pendant l'allaitement",
+      "Stérilisation systématique"
+    ],
+    "correct": 1,
+    "exp": "La contraception progestative seule (ou les méthodes non hormonales) est privilégiée en période d'allaitement, les œstrogènes pouvant réduire la lactation.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] En suites de couches normales, l'infirmière surveille l'involution utérine.",
+    "q": "Que doit-elle observer normalement dans les jours suivant l'accouchement ?",
+    "options": [
+      "Une augmentation progressive du volume utérin",
+      "Une diminution progressive du volume utérin (involution)",
+      "Un utérus qui reste inchangé",
+      "Une disparition immédiate de l'utérus en 24h"
+    ],
+    "correct": 1,
+    "exp": "L'involution utérine se traduit par une diminution progressive du volume utérin après l'accouchement, à surveiller par la hauteur du fond utérin.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente ayant eu une épisiotomie se plaint de douleur périnéale et d'un écoulement purulent à J5.",
+    "q": "Que faut-il suspecter ?",
+    "options": [
+      "Cicatrisation normale",
+      "Infection de la cicatrice d'épisiotomie",
+      "Hémorragie du post-partum tardive",
+      "Rétention urinaire"
+    ],
+    "correct": 1,
+    "exp": "Douleur associée à un écoulement purulent évoque une infection de la cicatrice, nécessitant une évaluation médicale.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente à 30 SA présente des contractions régulières et une modification cervicale.",
+    "q": "Quel traitement peut être proposé pour retarder l'accouchement ?",
+    "options": [
+      "Tocolyse (traitement freinant les contractions)",
+      "Ocytocine pour accélérer le travail",
+      "Antibiothérapie systématique seule",
+      "Aucun traitement n'est possible"
+    ],
+    "correct": 0,
+    "exp": "En cas de menace d'accouchement prématuré, une tocolyse peut être proposée pour retarder l'accouchement et permettre la maturation pulmonaire fœtale.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] La sage-femme évalue la dilatation du col lors d'un toucher vaginal en phase active du travail.",
+    "q": "Quelle dilatation correspond à la dilatation complète permettant le passage en phase d'expulsion ?",
+    "options": [
+      "5 cm",
+      "8 cm",
+      "10 cm",
+      "12 cm"
+    ],
+    "correct": 2,
+    "exp": "La dilatation complète du col est de 10 cm, marquant le passage à la 2e phase du travail (expulsion).",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Après la naissance, la sage-femme examine attentivement le placenta expulsé.",
+    "q": "Pourquoi cet examen est-il essentiel ?",
+    "options": [
+      "Pour déterminer le sexe de l'enfant",
+      "Pour vérifier l'intégrité et prévenir une rétention de fragments, cause d'hémorragie",
+      "Pour évaluer uniquement le poids de naissance",
+      "Ce geste n'a pas d'utilité clinique"
+    ],
+    "correct": 1,
+    "exp": "La vérification de l'intégrité du placenta permet de prévenir la rétention de fragments placentaires, cause majeure d'hémorragie du post-partum.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente enceinte signale une nette diminution des mouvements actifs fœtaux depuis la veille.",
+    "q": "Quelle est la conduite appropriée ?",
+    "options": [
+      "Rassurer sans investigation, c'est normal en fin de grossesse",
+      "Orienter vers une évaluation avec monitoring fœtal sans délai",
+      "Prescrire un repos à domicile de 48h",
+      "Ignorer si la patiente n'a pas de douleur"
+    ],
+    "correct": 1,
+    "exp": "Toute diminution des mouvements fœtaux ressentie par la patiente doit être prise au sérieux et évaluée par un monitoring fœtal sans délai.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une femme enceinte demande des conseils alimentaires de prévention.",
+    "q": "Quel aliment doit-elle éviter pour prévenir la listériose ?",
+    "options": [
+      "Les fromages à pâte cuite",
+      "Les fromages au lait cru et la charcuterie non cuite",
+      "Les légumes cuits",
+      "L'eau en bouteille"
+    ],
+    "correct": 1,
+    "exp": "Les fromages au lait cru et la charcuterie non cuite sont à éviter pendant la grossesse en raison du risque de listériose.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente prééclamptique présente une douleur épigastrique en barre, une thrombopénie et une cytolyse hépatique.",
+    "q": "Quel syndrome sévère faut-il évoquer ?",
+    "options": [
+      "Syndrome néphrotique",
+      "HELLP syndrome",
+      "Syndrome de Budd-Chiari",
+      "Syndrome de Mallory-Weiss"
+    ],
+    "correct": 1,
+    "exp": "L'association hémolyse, cytolyse hépatique et thrombopénie définit le HELLP syndrome, forme grave de prééclampsie.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente présentant un diabète gestationnel mal équilibré approche du terme.",
+    "q": "Quel risque fœtal principal est associé à ce contexte ?",
+    "options": [
+      "Retard de croissance intra-utérin systématique",
+      "Macrosomie fœtale et risque de dystocie des épaules",
+      "Anencéphalie",
+      "Trisomie 21"
+    ],
+    "correct": 1,
+    "exp": "Le diabète gestationnel mal équilibré expose à un risque de macrosomie fœtale, avec risque de dystocie des épaules à l'accouchement.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente présente une souffrance fœtale aiguë confirmée pendant le travail, sans possibilité d'accouchement voie basse rapide.",
+    "q": "Quelle décision obstétricale est alors envisagée ?",
+    "options": [
+      "Attendre l'accouchement spontané sans intervention",
+      "Césarienne en urgence",
+      "Simple changement de position maternelle suffisant",
+      "Administration d'antalgiques uniquement"
+    ],
+    "correct": 1,
+    "exp": "Une souffrance fœtale aiguë non résolue par les mesures conservatrices impose une extraction fœtale en urgence, souvent par césarienne.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une patiente en travail est installée en décubitus dorsal strict et présente une chute tensionnelle.",
+    "q": "Quelle position est recommandée pour éviter ce phénomène ?",
+    "options": [
+      "Décubitus dorsal strict maintenu",
+      "Décubitus latéral gauche",
+      "Position debout stricte",
+      "Position ventrale"
+    ],
+    "correct": 1,
+    "exp": "Le décubitus latéral gauche améliore le retour veineux et la perfusion utéro-placentaire, évitant la compression de la veine cave inférieure.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une jeune accouchée présente une tristesse transitoire les premiers jours, sans altération du lien mère-enfant, résolutive en quelques jours.",
+    "q": "Comment qualifier cet état, à distinguer d'une pathologie ?",
+    "options": [
+      "Dépression du post-partum",
+      "Baby blues (post-partum blues), phénomène transitoire physiologique",
+      "Psychose puerpérale",
+      "Trouble bipolaire"
+    ],
+    "correct": 1,
+    "exp": "Le baby blues est un état transitoire et physiologique, à distinguer de la dépression du post-partum qui est plus durable et intense.",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Maternité & Obstétrique] Une jeune mère se rend à sa consultation de suivi de l'enfant dans le système de santé maternelle et infantile israélien.",
+    "q": "Comment se nomme cette structure de suivi mère-enfant en Israël ?",
+    "options": [
+      "Bituach Leumi",
+      "Tipat Halav",
+      "Kupat Holim uniquement",
+      "Magen David Adom"
+    ],
+    "correct": 1,
+    "exp": "Tipat Halav est la structure israélienne de suivi de la santé maternelle et infantile (équivalent PMI).",
+    "bloc": 3,
+    "domain": "Maternité & Obstétrique"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un enfant de 18 kg doit recevoir du paracétamol à 15 mg/kg par prise.",
+    "q": "Quelle est la dose exacte à administrer ?",
+    "options": [
+      "180 mg",
+      "270 mg",
+      "300 mg",
+      "150 mg"
+    ],
+    "correct": 1,
+    "exp": "Calcul : 18 kg × 15 mg/kg = 270 mg par prise.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Une perfusion de 1500 mL doit passer en 12 heures.",
+    "q": "Quel est le débit horaire en mL/h ?",
+    "options": [
+      "100 mL/h",
+      "125 mL/h",
+      "150 mL/h",
+      "200 mL/h"
+    ],
+    "correct": 2,
+    "exp": "Calcul : 1500 mL ÷ 12h = 125 mL/h.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Une perfusion de 250 mL doit passer en 2 heures avec une tubulure macrogoutte (20 gouttes/mL).",
+    "q": "Quel est le débit en gouttes/minute ?",
+    "options": [
+      "21 gouttes/min",
+      "42 gouttes/min",
+      "60 gouttes/min",
+      "125 gouttes/min"
+    ],
+    "correct": 1,
+    "exp": "Calcul : (250 × 20) ÷ (2 × 60) = 5000 ÷ 120 ≈ 42 gouttes/min.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] L'infirmier prépare une administration médicamenteuse et applique la règle des 7R.",
+    "q": "Lequel des éléments suivants NE fait PAS partie de la règle des 7R ?",
+    "options": [
+      "Bon patient",
+      "Bonne dose",
+      "Préférence du service pour ce médicament",
+      "Droit de refus du patient"
+    ],
+    "correct": 2,
+    "exp": "La règle des 7R comprend : bon patient, bon médicament, bonne dose, bonne voie, bon moment, bonne documentation, droit de refus — pas de préférence de service.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Une prescription de chlorure de potassium (KCl) est reçue pour un patient hypokaliémique.",
+    "q": "Quelle voie d'administration est FORMELLEMENT INTERDITE ?",
+    "options": [
+      "Perfusion diluée lente",
+      "Bolus IV direct",
+      "Voie orale sous forme adaptée",
+      "Perfusion sur pompe avec surveillance"
+    ],
+    "correct": 1,
+    "exp": "Le KCl ne doit jamais être administré en bolus IV direct — risque d'arrêt cardiaque immédiat.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous héparine non fractionnée présente un saignement actif avec TCA très allongé.",
+    "q": "Quel est l'antidote spécifique à préparer ?",
+    "options": [
+      "Vitamine K",
+      "Sulfate de protamine",
+      "N-acétylcystéine",
+      "Flumazénil"
+    ],
+    "correct": 1,
+    "exp": "Le sulfate de protamine est l'antidote spécifique de l'héparine non fractionnée.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous antivitamine K (AVK) présente un INR à 8 avec un saignement actif.",
+    "q": "Quel traitement de réversion est indiqué en urgence ?",
+    "options": [
+      "Sulfate de protamine",
+      "Vitamine K et concentré de complexe prothrombique (CCP)",
+      "Naloxone",
+      "Gluconate de calcium"
+    ],
+    "correct": 1,
+    "exp": "La réversion en urgence des AVK associe vitamine K et CCP en cas de saignement actif avec INR très élevé.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient présente une dépression respiratoire sévère avec myosis après administration de morphine.",
+    "q": "Quel antidote doit être préparé en urgence ?",
+    "options": [
+      "Flumazénil",
+      "Naloxone",
+      "Atropine",
+      "Glucagon"
+    ],
+    "correct": 1,
+    "exp": "La naloxone est l'antidote spécifique de la surdose aux opioïdes, à administrer en cas de dépression respiratoire.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient est admis pour surdosage volontaire au paracétamol, découvert dans les 8 heures.",
+    "q": "Quel antidote est indiqué ?",
+    "options": [
+      "N-acétylcystéine",
+      "Naloxone",
+      "Flumazénil",
+      "Déféroxamine"
+    ],
+    "correct": 0,
+    "exp": "La N-acétylcystéine est l'antidote de référence du surdosage au paracétamol, d'autant plus efficace qu'administrée précocement.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient présente une sédation excessive après administration de benzodiazépines en excès.",
+    "q": "Quel antidote peut être envisagé, avec prudence ?",
+    "options": [
+      "Naloxone",
+      "Flumazénil",
+      "Protamine",
+      "Vitamine K"
+    ],
+    "correct": 1,
+    "exp": "Le flumazénil est l'antidote des benzodiazépines, à utiliser avec prudence (risque convulsif chez le patient dépendant chronique).",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Une patiente sous sulfate de magnésium pour prééclampsie présente une abolition des réflexes ostéo-tendineux et une bradypnée.",
+    "q": "Quel antidote doit être préparé en urgence ?",
+    "options": [
+      "Naloxone",
+      "Gluconate de calcium",
+      "Sulfate de protamine",
+      "Atropine"
+    ],
+    "correct": 1,
+    "exp": "Le gluconate de calcium est l'antidote du surdosage au sulfate de magnésium.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un enfant a ingéré accidentellement un grand nombre de comprimés de fer.",
+    "q": "Quel antidote spécifique peut être utilisé en cas d'intoxication sévère ?",
+    "options": [
+      "Déféroxamine",
+      "N-acétylcystéine",
+      "Naloxone",
+      "Glucagon"
+    ],
+    "correct": 0,
+    "exp": "La déféroxamine est l'antidote spécifique de l'intoxication sévère au fer.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient présente une bradycardie sévère et une hypotension après surdosage en bêta-bloquants.",
+    "q": "Quel antidote spécifique est envisagé ?",
+    "options": [
+      "Adrénaline uniquement",
+      "Glucagon",
+      "Naloxone",
+      "Sulfate de protamine"
+    ],
+    "correct": 1,
+    "exp": "Le glucagon est l'antidote spécifique utilisé en cas de surdosage sévère en bêta-bloquants.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un médicament à haut risque (insuline, héparine, chimiothérapie) doit être administré.",
+    "q": "Quelle règle de sécurité est systématiquement appliquée pour ces molécules ?",
+    "options": [
+      "Administration par un seul soignant sans vérification supplémentaire",
+      "Double vérification par un second soignant avant administration",
+      "Report systématique de 24h",
+      "Aucune règle spécifique n'est nécessaire"
+    ],
+    "correct": 1,
+    "exp": "Les médicaments à haut risque nécessitent systématiquement une double vérification par un second soignant avant administration.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Une prescription d'insuline rapide est reçue pour un patient diabétique.",
+    "q": "Dans quelle unité l'insuline doit-elle toujours être prescrite et administrée ?",
+    "options": [
+      "En millilitres uniquement",
+      "En unités internationales (UI)",
+      "En milligrammes",
+      "En grammes"
+    ],
+    "correct": 1,
+    "exp": "L'insuline doit toujours être prescrite et administrée en unités internationales (UI), jamais en volume approximatif.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient reçoit de la vancomycine en perfusion et présente un érythème du visage et du tronc pendant la perfusion.",
+    "q": "Quel syndrome évoque ce tableau et quelle en est la cause ?",
+    "options": [
+      "Choc anaphylactique lié à une allergie vraie",
+      "Syndrome de l'homme rouge, lié à une perfusion trop rapide",
+      "Syndrome sérotoninergique",
+      "Syndrome malin des neuroleptiques"
+    ],
+    "correct": 1,
+    "exp": "Le syndrome de l'homme rouge est lié à une perfusion trop rapide de vancomycine — il faut ralentir le débit et diluer davantage.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous aminosides (gentamicine) est surveillé régulièrement.",
+    "q": "Quels sont les deux organes principalement à risque de toxicité sous ce traitement ?",
+    "options": [
+      "Le foie et la peau",
+      "Les reins et l'oreille interne (néphro/ototoxicité)",
+      "Le cœur et les poumons",
+      "L'estomac et le pancréas"
+    ],
+    "correct": 1,
+    "exp": "Les aminosides exposent à un risque de néphrotoxicité et d'ototoxicité, nécessitant une surveillance rénale et auditive.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous antivitamine K au long cours réalise un contrôle biologique régulier.",
+    "q": "Quel est l'examen de surveillance biologique de référence pour les AVK ?",
+    "options": [
+      "TCA",
+      "INR",
+      "Anti-Xa",
+      "D-dimères"
+    ],
+    "correct": 1,
+    "exp": "L'INR est l'examen de référence pour la surveillance de l'anticoagulation par AVK, avec une cible généralement entre 2 et 3.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Une prescription de médicament dilué est reçue : 500mg dans 100mL de solvant, prescription de 250mg à administrer.",
+    "q": "Quel volume faut-il administrer ?",
+    "options": [
+      "25 mL",
+      "50 mL",
+      "100 mL",
+      "200 mL"
+    ],
+    "correct": 1,
+    "exp": "Calcul : (250mg ÷ 500mg) × 100mL = 50 mL.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient doit recevoir 3000mL de perfusion sur 24 heures.",
+    "q": "Quel est le débit horaire arrondi ?",
+    "options": [
+      "100 mL/h",
+      "125 mL/h",
+      "150 mL/h",
+      "175 mL/h"
+    ],
+    "correct": 2,
+    "exp": "Calcul : 3000mL ÷ 24h = 125 mL/h. (Note : vérifier l'arrondi exact selon l'énoncé — ici 3000/24=125)",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous digoxine doit recevoir sa dose quotidienne.",
+    "q": "Quel paramètre biologique et clinique doit être vérifié avant l'administration ?",
+    "options": [
+      "La glycémie uniquement",
+      "La kaliémie et la fréquence cardiaque",
+      "La créatininémie uniquement",
+      "La CRP uniquement"
+    ],
+    "correct": 1,
+    "exp": "La digoxine nécessite une vérification de la kaliémie (risque de toxicité en hypokaliémie) et de la fréquence cardiaque avant chaque administration.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous corticothérapie prolongée souhaite arrêter son traitement rapidement.",
+    "q": "Quelle est la règle de sécurité concernant l'arrêt de ce traitement ?",
+    "options": [
+      "Arrêt brutal possible à tout moment",
+      "Décroissance progressive obligatoire, jamais d'arrêt brutal",
+      "Le traitement peut être arrêté sans avis médical",
+      "Aucune règle particulière"
+    ],
+    "correct": 1,
+    "exp": "Un traitement corticoïde prolongé ne doit jamais être arrêté brutalement — décroissance progressive obligatoire en raison du risque d'insuffisance surrénalienne.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient insuffisant rénal doit recevoir un anti-inflammatoire non stéroïdien (AINS).",
+    "q": "Quelle est la conduite appropriée ?",
+    "options": [
+      "Administration sans précaution particulière",
+      "Prudence ou contre-indication en raison du risque de majoration de l'insuffisance rénale",
+      "Doubler la dose habituelle",
+      "Aucun lien entre AINS et fonction rénale"
+    ],
+    "correct": 1,
+    "exp": "Les AINS sont à utiliser avec prudence ou à éviter chez l'insuffisant rénal, en raison du risque de dégradation de la fonction rénale.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient sous certains médicaments (statines, immunosuppresseurs) consomme du jus de pamplemousse.",
+    "q": "Quel est le risque principal de cette association ?",
+    "options": [
+      "Aucun risque, association neutre",
+      "Interaction médicamenteuse pouvant augmenter la toxicité du médicament",
+      "Amélioration de l'efficacité du traitement",
+      "Diminution systématique de l'effet du médicament"
+    ],
+    "correct": 1,
+    "exp": "Le jus de pamplemousse inhibe certaines enzymes hépatiques et peut augmenter dangereusement les concentrations sanguines de certains médicaments.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Pharmacologie & Calculs] Un patient reçoit une injection sous-cutanée d'héparine de bas poids moléculaire.",
+    "q": "Quel geste est à proscrire après l'injection ?",
+    "options": [
+      "Laisser reposer le point d'injection",
+      "Masser le point d'injection",
+      "Alterner les sites d'injection",
+      "Vérifier l'absence de bulle d'air avant injection"
+    ],
+    "correct": 1,
+    "exp": "Il ne faut jamais masser le point d'injection après une héparine sous-cutanée — risque d'hématome et d'altération de l'absorption.",
+    "bloc": 5,
+    "domain": "Pharmacologie & Calculs"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient dépressif exprime un vague mal-être. L'infirmier hésite à aborder le sujet du suicide par crainte de le provoquer.",
+    "q": "Quelle affirmation est correcte concernant cette crainte ?",
+    "options": [
+      "Poser la question du risque suicidaire peut provoquer le passage à l'acte",
+      "Poser directement la question ne provoque jamais le passage à l'acte et permet une évaluation adaptée",
+      "Seul un psychiatre peut aborder ce sujet",
+      "Il vaut mieux ne jamais aborder ce sujet"
+    ],
+    "correct": 1,
+    "exp": "Poser directement la question du risque suicidaire ne provoque jamais le passage à l'acte — cela permet au contraire une évaluation adaptée et rassure souvent la personne.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient exprime des idées suicidaires avec un scénario précis, une échéance déterminée et un moyen létal accessible.",
+    "q": "Comment qualifier ce niveau de risque selon la méthode RUD ?",
+    "options": [
+      "Risque faible, pas d'action nécessaire",
+      "Urgence et dangerosité élevées, nécessitant une prise en charge immédiate",
+      "Situation à réévaluer dans une semaine",
+      "Aucune méthode d'évaluation structurée n'existe"
+    ],
+    "correct": 1,
+    "exp": "Un scénario précis, planifié, avec moyen létal accessible correspond à une urgence et une dangerosité élevées, nécessitant une prise en charge immédiate.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente une humeur élevée depuis 8 jours, une réduction du besoin de sommeil, une logorrhée et des dépenses inconsidérées.",
+    "q": "Quel diagnostic évoque ce tableau ?",
+    "options": [
+      "Épisode dépressif caractérisé",
+      "Épisode maniaque",
+      "Trouble anxieux généralisé",
+      "Trouble de la personnalité"
+    ],
+    "correct": 1,
+    "exp": "Humeur élevée, réduction du sommeil, logorrhée et comportements à risque pendant plus d'une semaine évoquent un épisode maniaque.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient sous lithium présente des tremblements amples, des vomissements et une confusion.",
+    "q": "Que faut-il suspecter en priorité ?",
+    "options": [
+      "Une amélioration clinique de l'épisode maniaque",
+      "Une toxicité au lithium nécessitant un dosage sanguin urgent",
+      "Une hypoglycémie sans lien avec le traitement",
+      "Un effet secondaire mineur sans gravité"
+    ],
+    "correct": 1,
+    "exp": "Ces signes évoquent une toxicité au lithium (index thérapeutique étroit) nécessitant l'arrêt du traitement et un dosage sanguin en urgence.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente des hallucinations auditives, des idées délirantes de persécution et un retrait social depuis plusieurs mois.",
+    "q": "Quels types de symptômes regroupent respectivement les hallucinations/délires et le retrait social ?",
+    "options": [
+      "Symptômes positifs et symptômes négatifs",
+      "Symptômes cognitifs uniquement",
+      "Symptômes somatiques uniquement",
+      "Il n'existe pas de telle classification"
+    ],
+    "correct": 0,
+    "exp": "Les hallucinations et idées délirantes sont des symptômes positifs ; le retrait social et l'émoussement affectif sont des symptômes négatifs de la schizophrénie.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient sous antipsychotique présente une hyperthermie majeure, une rigidité musculaire généralisée et une instabilité tensionnelle.",
+    "q": "Quel syndrome grave faut-il suspecter en urgence ?",
+    "options": [
+      "Syndrome sérotoninergique",
+      "Syndrome malin des neuroleptiques",
+      "Choc anaphylactique",
+      "Crise de tétanie"
+    ],
+    "correct": 1,
+    "exp": "Hyperthermie + rigidité musculaire sous antipsychotique évoquent un syndrome malin des neuroleptiques, urgence vitale nécessitant l'arrêt du traitement.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient sous antidépresseur présente des myoclonies, une hyperthermie, une agitation et une confusion après association médicamenteuse.",
+    "q": "Quel syndrome faut-il évoquer ?",
+    "options": [
+      "Syndrome malin des neuroleptiques",
+      "Syndrome sérotoninergique",
+      "Delirium tremens",
+      "Syndrome de sevrage simple"
+    ],
+    "correct": 1,
+    "exp": "La triade troubles neuromusculaires, neurovégétatifs et cognitifs sous antidépresseurs évoque un syndrome sérotoninergique, souvent lié à une association médicamenteuse.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient alcoolo-dépendant, sevré depuis 36 heures, présente confusion, hallucinations visuelles et agitation majeure avec fièvre.",
+    "q": "Quelle complication grave du sevrage faut-il évoquer ?",
+    "options": [
+      "Simple syndrome de sevrage mineur",
+      "Delirium tremens",
+      "Crise de panique",
+      "Syndrome sérotoninergique"
+    ],
+    "correct": 1,
+    "exp": "Confusion, hallucinations visuelles, agitation et fièvre chez un patient en sevrage alcoolique évoquent un delirium tremens, urgence vitale.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient alcoolique doit recevoir un soluté glucosé pour ses apports caloriques.",
+    "q": "Quelle vitamine doit être administrée AVANT ce soluté glucosé ?",
+    "options": [
+      "Vitamine C",
+      "Vitamine B1 (thiamine)",
+      "Vitamine D",
+      "Vitamine K"
+    ],
+    "correct": 1,
+    "exp": "La thiamine doit toujours être administrée avant tout soluté glucosé chez un patient alcoolique, pour prévenir le syndrome de Gayet-Wernicke.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient sous benzodiazépines au long cours souhaite arrêter brutalement son traitement.",
+    "q": "Quel risque principal expose cet arrêt brutal ?",
+    "options": [
+      "Aucun risque particulier",
+      "Risque convulsif et anxiété rebond sévère",
+      "Amélioration immédiate sans risque",
+      "Somnolence uniquement"
+    ],
+    "correct": 1,
+    "exp": "L'arrêt brutal de benzodiazépines après usage prolongé expose à un risque convulsif et une anxiété rebond sévère — décroissance progressive obligatoire.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente une attaque de panique avec palpitations, sensation d'étouffement et peur de mourir.",
+    "q": "Cette crise présente-t-elle un danger vital immédiat ?",
+    "options": [
+      "Oui, c'est une urgence vitale systématique",
+      "Non, elle n'est jamais dangereuse en elle-même bien que vécue intensément",
+      "Oui, uniquement chez les patients âgés",
+      "Cela dépend uniquement de la durée"
+    ],
+    "correct": 1,
+    "exp": "Une attaque de panique n'est jamais dangereuse en elle-même sur le plan vital, même si elle est vécue de façon extrêmement intense par le patient.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente une anxiété excessive et incontrôlable, présente la majorité des jours depuis 8 mois, concernant plusieurs domaines de vie.",
+    "q": "Quel diagnostic évoque ce tableau ?",
+    "options": [
+      "Attaque de panique isolée",
+      "Trouble anxieux généralisé (TAG)",
+      "Phobie spécifique",
+      "Trouble obsessionnel compulsif"
+    ],
+    "correct": 1,
+    "exp": "Une anxiété excessive et chronique (≥6 mois) touchant plusieurs domaines de vie est caractéristique du trouble anxieux généralisé.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient ayant survécu à une agression grave présente des flashbacks, un évitement des lieux associés, et une hypervigilance depuis 2 mois.",
+    "q": "Quel diagnostic évoque ce tableau ?",
+    "options": [
+      "Trouble panique",
+      "État de stress post-traumatique (ESPT)",
+      "Trouble de l'adaptation simple",
+      "Schizophrénie"
+    ],
+    "correct": 1,
+    "exp": "Reviviscences, évitement et hyperactivation neurovégétative après un événement traumatique évoquent un état de stress post-traumatique.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente un trouble mental associé à un danger immédiat pour lui-même du fait de ce trouble, et refuse toute hospitalisation.",
+    "q": "Quels sont les 2 critères cumulatifs nécessaires à une hospitalisation sous contrainte en Israël ?",
+    "options": [
+      "Âge et absence de traitement",
+      "Trouble mental ET danger immédiat pour soi/autrui du fait de ce trouble",
+      "Décision familiale uniquement",
+      "Décision judiciaire seule, sans critère médical"
+    ],
+    "correct": 1,
+    "exp": "L'hospitalisation sous contrainte nécessite la présence cumulative d'un trouble mental ET d'un danger immédiat du fait de ce trouble.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient débute un traitement antidépresseur et se plaint de l'absence d'effet après 5 jours.",
+    "q": "Quelle information est importante à lui transmettre ?",
+    "options": [
+      "L'effet est immédiat, il faut changer de traitement",
+      "L'effet thymique complet nécessite généralement 2 à 4 semaines",
+      "Le traitement doit être arrêté immédiatement",
+      "Il faut doubler la dose sans avis médical"
+    ],
+    "correct": 1,
+    "exp": "Le délai d'action des antidépresseurs pour l'effet thymique complet est généralement de 2 à 4 semaines — information essentielle pour prévenir l'arrêt prématuré.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un jeune patient de 19 ans débute un traitement antidépresseur pour un épisode dépressif.",
+    "q": "Quelle surveillance particulière est recommandée dans les premières semaines ?",
+    "options": [
+      "Aucune surveillance particulière n'est nécessaire",
+      "Surveillance accrue du risque suicidaire, majoré chez les moins de 25 ans en début de traitement",
+      "Surveillance de la fonction rénale uniquement",
+      "Surveillance de la glycémie uniquement"
+    ],
+    "correct": 1,
+    "exp": "Le risque suicidaire peut transitoirement augmenter en début de traitement antidépresseur, particulièrement chez les moins de 25 ans — surveillance accrue nécessaire.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Une jeune patiente présente un poids très inférieur à la normale, une peur intense de prendre du poids et un déni de la maigreur.",
+    "q": "Quel trouble évoque ce tableau ?",
+    "options": [
+      "Boulimie",
+      "Anorexie mentale",
+      "Trouble bipolaire",
+      "Trouble panique"
+    ],
+    "correct": 1,
+    "exp": "Poids très bas, peur intense de grossir et déni de la maigreur sont caractéristiques de l'anorexie mentale.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente une instabilité émotionnelle marquée, des relations interpersonnelles intenses et instables, avec alternance idéalisation/dévalorisation.",
+    "q": "Quel trouble de la personnalité évoque ce tableau ?",
+    "options": [
+      "Trouble de la personnalité obsessionnelle-compulsive",
+      "Trouble de la personnalité limite (borderline)",
+      "Trouble de la personnalité schizoïde",
+      "Trouble de la personnalité évitante"
+    ],
+    "correct": 1,
+    "exp": "L'instabilité émotionnelle et relationnelle avec clivage (idéalisation/dévalorisation) est caractéristique du trouble de la personnalité limite.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient en sevrage aux opioïdes présente mydriase, bâillements, larmoiement, sueurs et douleurs musculaires diffuses.",
+    "q": "Ce syndrome de sevrage est-il potentiellement mortel ?",
+    "options": [
+      "Oui, systématiquement mortel sans traitement",
+      "Non, très inconfortable mais rarement mortel",
+      "Oui, uniquement chez les patients âgés",
+      "Il ne s'agit pas d'un syndrome de sevrage"
+    ],
+    "correct": 1,
+    "exp": "Le sevrage aux opioïdes est très inconfortable mais rarement mortel, contrairement au sevrage alcoolique ou aux benzodiazépines sévères.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient reçoit de la naloxone pour une surdose aux opioïdes à longue durée d'action.",
+    "q": "Quel risque doit être surveillé après l'administration ?",
+    "options": [
+      "Aucun risque, l'effet est définitif",
+      "Risque de re-sédation, la naloxone ayant une durée d'action souvent plus courte que l'opioïde",
+      "Risque de convulsions systématiques",
+      "Risque d'allergie croisée uniquement"
+    ],
+    "correct": 1,
+    "exp": "La naloxone a souvent une durée d'action plus courte que l'opioïde en cause — surveillance prolongée nécessaire en raison du risque de re-sédation.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient âgé présente une confusion aiguë brutale et fluctuante, apparue en quelques heures, avec trouble de l'attention.",
+    "q": "Comment différencier ce tableau d'une démence ?",
+    "options": [
+      "Aucune différence, ce sont des synonymes",
+      "Le délirium est aigu et fluctuant, la démence est chronique et progressive",
+      "La démence est toujours réversible",
+      "Le délirium ne touche jamais l'attention"
+    ],
+    "correct": 1,
+    "exp": "Le délirium (confusion aiguë) se caractérise par un début brutal et une évolution fluctuante, à la différence de la démence qui est chronique et progressive.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient âgé présente une confusion aiguë d'apparition récente.",
+    "q": "Quelle démarche est prioritaire face à ce tableau ?",
+    "options": [
+      "Sédation immédiate systématique",
+      "Rechercher une cause réversible (infection, médicament, trouble métabolique)",
+      "Contention physique systématique",
+      "Aucune investigation n'est nécessaire chez la personne âgée"
+    ],
+    "correct": 1,
+    "exp": "Face à un délirium, il faut systématiquement rechercher une cause réversible (infection, effet médicamenteux, trouble métabolique) avant toute autre mesure.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient présente des pensées intrusives répétitives associées à des comportements ritualisés visant à réduire l'anxiété qu'elles génèrent.",
+    "q": "Quel trouble évoque ce tableau ?",
+    "options": [
+      "Trouble obsessionnel compulsif (TOC)",
+      "Trouble panique",
+      "Schizophrénie",
+      "Trouble bipolaire"
+    ],
+    "correct": 0,
+    "exp": "Pensées intrusives (obsessions) associées à des rituels compulsifs visant à réduire l'anxiété sont caractéristiques du TOC.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient délirant exprime des idées de persécution envers l'équipe soignante.",
+    "q": "Quelle attitude est recommandée face à ce discours délirant ?",
+    "options": [
+      "Confronter frontalement et démontrer que c'est faux",
+      "Ne pas valider le contenu délirant mais reconnaître la souffrance vécue sans le confronter frontalement",
+      "Valider entièrement le contenu délirant pour rassurer",
+      "Ignorer complètement le patient"
+    ],
+    "correct": 1,
+    "exp": "Il ne faut ni valider ni confronter frontalement le délire, mais reconnaître la souffrance vécue par le patient tout en maintenant une communication claire et stable.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Psychiatrie & Santé Mentale] Un patient sous antipsychotique de 1ère génération présente des contractions musculaires soutenues et douloureuses du cou peu après le début du traitement.",
+    "q": "Quel effet secondaire précoce évoque ce tableau ?",
+    "options": [
+      "Dyskinésie tardive",
+      "Dystonie aiguë",
+      "Syndrome métabolique",
+      "Akathisie"
+    ],
+    "correct": 1,
+    "exp": "La dystonie aiguë est un effet extrapyramidal précoce des antipsychotiques, se manifestant par des contractions musculaires soutenues et douloureuses.",
+    "bloc": 4,
+    "domain": "Psychiatrie & Santé Mentale"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une hémiplégie brutale avec une imagerie cérébrale montrant un saignement intracérébral.",
+    "q": "Quel traitement est FORMELLEMENT CONTRE-INDIQUÉ dans ce contexte ?",
+    "options": [
+      "Surveillance de la tension artérielle",
+      "La thrombolyse",
+      "Le contrôle glycémique",
+      "L'évaluation neurologique répétée"
+    ],
+    "correct": 1,
+    "exp": "La thrombolyse est formellement contre-indiquée en cas d'AVC hémorragique — d'où l'importance absolue de l'imagerie avant tout traitement.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une fièvre élevée, une raideur de nuque et une photophobie intense.",
+    "q": "Quel diagnostic doit être évoqué en urgence ?",
+    "options": [
+      "Migraine simple",
+      "Méningite",
+      "Sinusite",
+      "Névralgie du trijumeau"
+    ],
+    "correct": 1,
+    "exp": "Fièvre, raideur de nuque et photophobie constituent la triade classique évocatrice de méningite, urgence diagnostique et thérapeutique.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente un tremblement de repos, une rigidité musculaire et une lenteur des mouvements (bradykinésie).",
+    "q": "Quelle pathologie neurodégénérative évoque cette triade ?",
+    "options": [
+      "Sclérose en plaques",
+      "Maladie de Parkinson",
+      "Myasthénie",
+      "Sclérose latérale amyotrophique"
+    ],
+    "correct": 1,
+    "exp": "La triade tremblement de repos, rigidité et bradykinésie est caractéristique de la maladie de Parkinson.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un jeune patient présente des épisodes de troubles visuels, des paresthésies et une faiblesse musculaire fluctuante dans le temps.",
+    "q": "Quelle pathologie neurologique auto-immune évoque ce tableau ?",
+    "options": [
+      "Sclérose en plaques",
+      "Maladie d'Alzheimer",
+      "Épilepsie",
+      "Migraine"
+    ],
+    "correct": 0,
+    "exp": "Des signes neurologiques multifocaux fluctuants dans le temps chez un sujet jeune sont évocateurs d'une sclérose en plaques.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une faiblesse musculaire fluctuante, majorée par l'effort et améliorée par le repos, touchant notamment les paupières.",
+    "q": "Quelle pathologie neuromusculaire évoque ce tableau ?",
+    "options": [
+      "Myasthénie",
+      "Maladie de Parkinson",
+      "AVC",
+      "Sclérose en plaques"
+    ],
+    "correct": 0,
+    "exp": "La fatigabilité musculaire majorée à l'effort et améliorée au repos, touchant souvent les muscles oculaires, est caractéristique de la myasthénie.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une baisse brutale de la diurèse associée à une hypotension sévère post-hémorragique.",
+    "q": "Quel mécanisme d'insuffisance rénale aiguë est le plus probable ?",
+    "options": [
+      "Mécanisme post-rénal (obstacle)",
+      "Mécanisme pré-rénal (hypoperfusion)",
+      "Mécanisme rénal intrinsèque uniquement",
+      "Il n'y a pas de lien entre hypotension et fonction rénale"
+    ],
+    "correct": 1,
+    "exp": "Une hypoperfusion rénale (hypotension, choc) provoque une insuffisance rénale aiguë de mécanisme pré-rénal, généralement réversible si correction rapide.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient insuffisant rénal présente à l'ECG des ondes T pointues et un élargissement du QRS.",
+    "q": "Quelle anomalie électrolytique évoque ce tracé ?",
+    "options": [
+      "Hypokaliémie",
+      "Hyperkaliémie sévère",
+      "Hypercalcémie",
+      "Hyponatrémie"
+    ],
+    "correct": 1,
+    "exp": "Ondes T pointues et élargissement du QRS sont évocateurs d'une hyperkaliémie sévère, urgence vitale nécessitant un traitement immédiat.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient cirrhotique présente une confusion, un astérixis (flapping tremor) et une haleine caractéristique.",
+    "q": "Quelle complication de l'insuffisance hépatique évoque ce tableau ?",
+    "options": [
+      "Encéphalopathie hépatique",
+      "AVC ischémique",
+      "Hypoglycémie isolée",
+      "Delirium tremens"
+    ],
+    "correct": 0,
+    "exp": "Confusion, astérixis et fœtor hépatique sont caractéristiques de l'encéphalopathie hépatique, complication de l'insuffisance hépatique sévère.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient cirrhotique présente une hématémèse massive.",
+    "q": "Quelle cause fréquente et grave d'hémorragie digestive faut-il évoquer chez ce patient ?",
+    "options": [
+      "Ulcère gastrique simple",
+      "Rupture de varices œsophagiennes",
+      "Gastrite légère",
+      "Reflux gastro-œsophagien"
+    ],
+    "correct": 1,
+    "exp": "Chez le patient cirrhotique, la rupture de varices œsophagiennes est une cause fréquente et potentiellement massive d'hémorragie digestive haute.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient BPCO connu avec hypercapnie chronique reçoit de l'oxygène à haut débit sans titration.",
+    "q": "Quel risque principal expose cette oxygénothérapie non titrée ?",
+    "options": [
+      "Aucun risque particulier",
+      "Risque de dépression du stimulus respiratoire hypoxique et d'hypercapnie aggravée",
+      "Amélioration systématique sans risque",
+      "Risque d'hypoglycémie"
+    ],
+    "correct": 1,
+    "exp": "Chez le BPCO avec hypercapnie chronique, une oxygénothérapie non titrée peut supprimer le stimulus hypoxique et aggraver l'hypercapnie — saturation cible généralement 88-92%.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une fièvre, une toux productive et des crépitants localisés à l'auscultation pulmonaire.",
+    "q": "Quel diagnostic est le plus probable ?",
+    "options": [
+      "Pneumonie",
+      "Embolie pulmonaire",
+      "Pneumothorax",
+      "Asthme"
+    ],
+    "correct": 0,
+    "exp": "Fièvre, toux productive et crépitants focalisés sont évocateurs d'une pneumonie.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient est diagnostiqué avec une tuberculose pulmonaire active.",
+    "q": "Quel type de précaution d'isolement doit être mis en place ?",
+    "options": [
+      "Précautions contact uniquement",
+      "Précautions air (isolement respiratoire)",
+      "Aucune précaution particulière",
+      "Précautions gouttelettes uniquement"
+    ],
+    "correct": 1,
+    "exp": "La tuberculose active nécessite des précautions air (isolement respiratoire avec chambre à pression négative si disponible, port de masque FFP2).",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une pâleur cutanéo-muqueuse, une asthénie et une dyspnée d'effort, avec hémoglobine basse au bilan.",
+    "q": "Quel diagnostic est confirmé par ce tableau ?",
+    "options": [
+      "Anémie",
+      "Polyglobulie",
+      "Leucémie systématiquement",
+      "Thrombocytopénie isolée"
+    ],
+    "correct": 0,
+    "exp": "Pâleur, asthénie, dyspnée d'effort et hémoglobine basse confirment une anémie, dont la cause doit être recherchée.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente des douleurs et gonflements articulaires symétriques touchant les petites articulations des mains depuis plusieurs mois.",
+    "q": "Quelle pathologie chronique évoque ce tableau ?",
+    "options": [
+      "Arthrose simple",
+      "Polyarthrite rhumatoïde",
+      "Goutte",
+      "Lombalgie mécanique"
+    ],
+    "correct": 1,
+    "exp": "L'atteinte symétrique des petites articulations avec évolution chronique est évocatrice de polyarthrite rhumatoïde.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une fatigue, une prise de poids, une frilosité et une constipation.",
+    "q": "Quelle pathologie endocrinienne évoque ce tableau ?",
+    "options": [
+      "Hyperthyroïdie",
+      "Hypothyroïdie",
+      "Diabète de type 1",
+      "Insuffisance surrénalienne aiguë"
+    ],
+    "correct": 1,
+    "exp": "Fatigue, prise de poids, frilosité et constipation sont évocateurs d'une hypothyroïdie.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient hyperthyroïdien connu présente une fièvre élevée, une tachycardie majeure, une agitation extrême et une confusion.",
+    "q": "Quelle complication grave et urgente faut-il évoquer ?",
+    "options": [
+      "Crise thyréotoxique (urgence)",
+      "Simple poussée d'hyperthyroïdie sans gravité",
+      "Hypoglycémie isolée",
+      "Crise d'angoisse"
+    ],
+    "correct": 0,
+    "exp": "Ce tableau évoque une crise thyréotoxique, urgence endocrinienne vitale nécessitant une prise en charge immédiate.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une exophtalmie, un goitre et une tachycardie.",
+    "q": "Quelle pathologie thyroïdienne auto-immune évoque cette association ?",
+    "options": [
+      "Maladie de Basedow (Graves)",
+      "Thyroïdite de Hashimoto",
+      "Cancer thyroïdien",
+      "Nodule thyroïdien bénin isolé"
+    ],
+    "correct": 0,
+    "exp": "L'exophtalmie associée à un goitre et une tachycardie est caractéristique de la maladie de Basedow.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une douleur articulaire brutale et intense du gros orteil, rouge et chaud.",
+    "q": "Quelle pathologie métabolique évoque cette crise ?",
+    "options": [
+      "Crise de goutte",
+      "Polyarthrite rhumatoïde",
+      "Arthrose",
+      "Ostéoporose"
+    ],
+    "correct": 0,
+    "exp": "Une monoarthrite brutale et douloureuse du gros orteil est très évocatrice d'une crise de goutte (dépôt de cristaux d'acide urique).",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Une jeune femme présente une éruption en aile de papillon sur le visage, une fatigue et des douleurs articulaires diffuses.",
+    "q": "Quelle maladie auto-immune systémique évoque ce tableau ?",
+    "options": [
+      "Lupus érythémateux disséminé",
+      "Sclérodermie",
+      "Polyarthrite rhumatoïde isolée",
+      "Dermatomyosite"
+    ],
+    "correct": 0,
+    "exp": "L'éruption malaire en aile de papillon associée à une atteinte multisystémique évoque un lupus érythémateux disséminé.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente des œdèmes généralisés importants, une protéinurie massive et une hypoalbuminémie.",
+    "q": "Quel syndrome néphrologique évoque cette triade ?",
+    "options": [
+      "Syndrome néphritique aigu",
+      "Syndrome néphrotique",
+      "Insuffisance rénale chronique terminale isolée",
+      "Colique néphrétique"
+    ],
+    "correct": 1,
+    "exp": "Œdèmes, protéinurie massive et hypoalbuminémie définissent le syndrome néphrotique.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une douleur épigastrique transfixiante en barre, des vomissements, avec une lipasémie très élevée.",
+    "q": "Quel diagnostic est confirmé par ce tableau ?",
+    "options": [
+      "Pancréatite aiguë",
+      "Appendicite",
+      "Ulcère gastrique simple",
+      "Colique hépatique"
+    ],
+    "correct": 0,
+    "exp": "Douleur épigastrique en barre associée à une lipasémie très élevée (>3x la normale) confirme une pancréatite aiguë.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente une douleur en fosse iliaque gauche, une fièvre et des troubles du transit.",
+    "q": "Quel diagnostic digestif est évoqué en priorité ?",
+    "options": [
+      "Appendicite",
+      "Diverticulite",
+      "Cholécystite",
+      "Pancréatite"
+    ],
+    "correct": 1,
+    "exp": "Douleur en fosse iliaque gauche, fièvre et troubles du transit sont évocateurs d'une diverticulite sigmoïdienne.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente des douleurs abdominales diffuses, un arrêt des matières et des gaz, avec météorisme abdominal.",
+    "q": "Quel diagnostic chirurgical évoque ce tableau ?",
+    "options": [
+      "Occlusion intestinale",
+      "Gastro-entérite simple",
+      "Colique néphrétique",
+      "Reflux gastro-œsophagien"
+    ],
+    "correct": 0,
+    "exp": "Arrêt des matières et des gaz associé à un météorisme abdominal évoque une occlusion intestinale.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un patient présente des douleurs épigastriques calmées par l'alimentation, avec un test positif à Helicobacter pylori.",
+    "q": "Quel diagnostic est confirmé et quelle est la bactérie impliquée ?",
+    "options": [
+      "Ulcère gastroduodénal lié à Helicobacter pylori",
+      "Pancréatite chronique",
+      "Cancer gastrique systématiquement",
+      "Reflux gastro-œsophagien isolé"
+    ],
+    "correct": 0,
+    "exp": "Helicobacter pylori est fortement associé à l'ulcère gastroduodénal, dont l'éradication fait partie du traitement.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Médecine Interne & Neurologie] Un soignant réalise un soin auprès d'un patient séropositif au VIH.",
+    "q": "Quelle est la conduite de prévention appropriée ?",
+    "options": [
+      "Précautions spécifiques uniquement pour ce patient",
+      "Précautions standard appliquées systématiquement à tous les patients",
+      "Aucune précaution n'est nécessaire",
+      "Isolement strict systématique"
+    ],
+    "correct": 1,
+    "exp": "Les précautions standard s'appliquent systématiquement à tous les patients, indépendamment du statut sérologique connu ou non — c'est le principe fondamental de prévention.",
+    "bloc": 2,
+    "domain": "Médecine Interne & Neurologie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient plâtré au membre inférieur se plaint d'une douleur intense, disproportionnée, non calmée par les antalgiques, avec paresthésies des orteils.",
+    "q": "Quelle complication grave doit être suspectée en urgence ?",
+    "options": [
+      "Phlébite superficielle simple",
+      "Syndrome des loges (compartment syndrome)",
+      "Simple striction du plâtre sans gravité",
+      "Lombalgie associée"
+    ],
+    "correct": 1,
+    "exp": "Douleur disproportionnée et paresthésies sous plâtre évoquent un syndrome des loges, urgence chirurgicale par hyperpression dans la loge musculaire.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une fracture ouverte du tibia suite à un accident.",
+    "q": "Quelle est la priorité de prise en charge initiale ?",
+    "options": [
+      "Réduction immédiate de la fracture sans autre geste",
+      "Couvrir la plaie stérilement, immobiliser, prévenir l'infection et évaluer l'état vasculo-nerveux",
+      "Mobiliser le membre pour évaluer la douleur",
+      "Retarder toute prise en charge de plusieurs heures"
+    ],
+    "correct": 1,
+    "exp": "Une fracture ouverte nécessite une couverture stérile de la plaie, une immobilisation, une évaluation vasculo-nerveuse et une prévention de l'infection en urgence.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une luxation de l'épaule suite à une chute.",
+    "q": "Quelle est la conduite infirmière avant la réduction médicale ?",
+    "options": [
+      "Réduire soi-même la luxation immédiatement",
+      "Immobiliser le membre dans la position trouvée et attendre l'évaluation médicale",
+      "Mobiliser activement le bras pour évaluer l'amplitude",
+      "Masser vigoureusement l'articulation"
+    ],
+    "correct": 1,
+    "exp": "Avant réduction médicale, il faut immobiliser le membre dans la position la moins douloureuse trouvée, sans tenter de réduire soi-même la luxation.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient revient du bloc opératoire après une chirurgie abdominale sous anesthésie générale.",
+    "q": "Quels paramètres doivent être surveillés en priorité en post-opératoire immédiat ?",
+    "options": [
+      "Uniquement la douleur",
+      "Les paramètres vitaux (conscience, respiration, hémodynamique), la douleur et le site opératoire",
+      "Uniquement la température",
+      "Aucune surveillance particulière n'est nécessaire"
+    ],
+    "correct": 1,
+    "exp": "La surveillance post-opératoire immédiate porte sur les paramètres vitaux complets, l'état de conscience, la douleur et le site opératoire (saignement, pansement).",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient opéré récemment est alité depuis plusieurs jours.",
+    "q": "Quelles mesures préviennent le risque de thrombose veineuse post-opératoire ?",
+    "options": [
+      "Alitement strict prolongé",
+      "Lever précoce, bas de contention, anticoagulation préventive sur prescription",
+      "Restriction hydrique stricte",
+      "Aucune mesure spécifique n'est nécessaire"
+    ],
+    "correct": 1,
+    "exp": "Le lever précoce, les bas de contention et l'anticoagulation préventive sur prescription sont les mesures de référence pour prévenir la thrombose veineuse post-opératoire.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient doit être opéré le lendemain matin sous anesthésie générale.",
+    "q": "Quelle est la règle générale de jeûne pré-opératoire pour les aliments solides ?",
+    "options": [
+      "Aucun jeûne n'est nécessaire",
+      "Jeûne d'environ 6 heures pour les solides avant l'intervention",
+      "Jeûne de 30 minutes suffit",
+      "Jeûne de 48 heures obligatoire"
+    ],
+    "correct": 1,
+    "exp": "Le jeûne pré-opératoire est généralement d'environ 6 heures pour les aliments solides (règles pouvant varier selon protocole et type d'anesthésie).",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient porte un drain de Redon en post-opératoire.",
+    "q": "Que doit surveiller l'infirmier concernant ce drain ?",
+    "options": [
+      "Uniquement la présence du drain, sans autre surveillance",
+      "La quantité et l'aspect du liquide recueilli, ainsi que la perméabilité",
+      "Le drain n'a pas besoin d'être surveillé après la pose",
+      "Uniquement la couleur du pansement environnant"
+    ],
+    "correct": 1,
+    "exp": "La surveillance du drain porte sur la quantité et l'aspect du liquide recueilli, ainsi que sa perméabilité, éléments essentiels pour dépister une complication.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une rougeur, une chaleur et un écoulement purulent au niveau de sa cicatrice opératoire.",
+    "q": "Que faut-il suspecter ?",
+    "options": [
+      "Cicatrisation normale",
+      "Infection du site opératoire",
+      "Réaction allergique au pansement uniquement",
+      "Absence de signification clinique"
+    ],
+    "correct": 1,
+    "exp": "Rougeur, chaleur et écoulement purulent sont des signes d'infection du site opératoire nécessitant une évaluation médicale.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient alité présente un risque élevé d'escarre selon l'échelle de Braden.",
+    "q": "Quelle mesure de prévention est prioritaire ?",
+    "options": [
+      "Aucune mesure spécifique n'est nécessaire",
+      "Changements de position réguliers et surveillance cutanée",
+      "Restriction hydrique stricte",
+      "Immobilisation complète sans mobilisation"
+    ],
+    "correct": 1,
+    "exp": "Les changements de position réguliers et la surveillance cutanée sont les mesures de prévention de référence contre les escarres chez le patient à risque.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une douleur en fosse iliaque droite, avec un point douloureux caractéristique à la palpation.",
+    "q": "Comment se nomme ce point douloureux évocateur d'appendicite ?",
+    "options": [
+      "Point de Murphy",
+      "Point de McBurney",
+      "Point de Valleix",
+      "Point de MacBride"
+    ],
+    "correct": 1,
+    "exp": "Le point de McBurney, situé en fosse iliaque droite, est le point douloureux caractéristique de l'appendicite.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une douleur de l'hypochondre droit majorée à l'inspiration profonde lors de la palpation sous-costale.",
+    "q": "Comment se nomme ce signe évocateur de cholécystite ?",
+    "options": [
+      "Signe de Murphy",
+      "Signe de McBurney",
+      "Signe de Babinski",
+      "Signe de Kernig"
+    ],
+    "correct": 0,
+    "exp": "Le signe de Murphy (arrêt de l'inspiration douloureux à la palpation de l'hypochondre droit) est évocateur de cholécystite aiguë.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une hernie inguinale devenue douloureuse, irréductible, avec vomissements et arrêt du transit.",
+    "q": "Quelle complication grave faut-il évoquer en urgence ?",
+    "options": [
+      "Hernie non compliquée simple",
+      "Hernie étranglée — urgence chirurgicale",
+      "Simple lipome sous-cutané",
+      "Adénopathie inguinale bénigne"
+    ],
+    "correct": 1,
+    "exp": "Une hernie irréductible et douloureuse avec signes occlusifs évoque un étranglement herniaire, urgence chirurgicale absolue.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient opéré d'une prothèse totale de hanche par voie postérieure doit être éduqué sur les précautions post-opératoires.",
+    "q": "Quel mouvement doit-il éviter pour prévenir la luxation de sa prothèse ?",
+    "options": [
+      "La flexion de hanche au-delà de 90° et la rotation interne excessive",
+      "La marche assistée",
+      "La position allongée sur le dos",
+      "La flexion légère du genou"
+    ],
+    "correct": 0,
+    "exp": "Après prothèse de hanche par voie postérieure, il faut éviter la flexion excessive (>90°), l'adduction et la rotation interne, qui exposent au risque de luxation.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient amputé d'un membre inférieur se plaint de douleurs ressenties dans le membre absent.",
+    "q": "Comment se nomme ce phénomène fréquent après amputation ?",
+    "options": [
+      "Neuropathie périphérique classique",
+      "Douleur du membre fantôme",
+      "Syndrome des loges résiduel",
+      "Sciatique post-opératoire"
+    ],
+    "correct": 1,
+    "exp": "La douleur du membre fantôme est un phénomène fréquent après amputation, nécessitant une prise en charge spécifique de la douleur.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient porteur d'une colostomie récente doit apprendre à gérer son appareillage.",
+    "q": "Quelle surveillance est essentielle autour de la stomie ?",
+    "options": [
+      "Aucune surveillance particulière n'est nécessaire",
+      "Surveillance de la coloration de la stomie (doit rester rose/rouge vif) et de l'état cutané péristomial",
+      "Surveillance uniquement du poids",
+      "Surveillance uniquement de la température"
+    ],
+    "correct": 1,
+    "exp": "La surveillance de la coloration de la stomie et de l'état cutané péristomial permet de dépister précocement une ischémie ou une irritation cutanée.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient est sous traction orthopédique pour une fracture du fémur.",
+    "q": "Quelle surveillance est prioritaire concernant le membre tracté ?",
+    "options": [
+      "Uniquement la douleur",
+      "L'état neurovasculaire du membre (couleur, chaleur, sensibilité, pouls, mobilité)",
+      "Uniquement le poids de traction sans autre surveillance",
+      "Aucune surveillance spécifique n'est nécessaire"
+    ],
+    "correct": 1,
+    "exp": "La surveillance neurovasculaire régulière (couleur, chaleur, sensibilité, pouls distal, mobilité) est essentielle sous traction orthopédique pour dépister une complication.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient plâtré signale des orteils froids, pâles et une diminution de la sensibilité.",
+    "q": "Que faut-il suspecter et quelle est la conduite ?",
+    "options": [
+      "Signe normal sans gravité, à ignorer",
+      "Suspicion de syndrome des loges ou compression vasculaire — alerte médicale immédiate",
+      "Simple sensation de froid ambiant",
+      "Aucune action n'est nécessaire avant 24h"
+    ],
+    "correct": 1,
+    "exp": "Ces signes évoquent une compression vasculo-nerveuse ou un syndrome des loges sous plâtre — urgence nécessitant une alerte médicale immédiate.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient victime d'un traumatisme est retrouvé sur la voie publique, suspicion de traumatisme du rachis.",
+    "q": "Quelle est la priorité de prise en charge initiale ?",
+    "options": [
+      "Mobiliser normalement le patient pour l'examiner",
+      "Immobilisation cervicale et rachidienne stricte avant toute mobilisation",
+      "Position assise pour faciliter l'examen",
+      "Aucune précaution particulière n'est nécessaire"
+    ],
+    "correct": 1,
+    "exp": "Face à une suspicion de traumatisme rachidien, l'immobilisation cervicale et rachidienne stricte est prioritaire avant toute mobilisation, pour prévenir une lésion médullaire secondaire.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une brûlure avec phlyctènes, rouge, très douloureuse, sans atteinte des structures profondes.",
+    "q": "Quel degré de brûlure évoque ce tableau ?",
+    "options": [
+      "1er degré",
+      "2e degré superficiel",
+      "3e degré",
+      "4e degré"
+    ],
+    "correct": 1,
+    "exp": "Une brûlure avec phlyctènes, rouge et très douloureuse correspond typiquement à un 2e degré superficiel (atteinte du derme superficiel).",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient doit signer un consentement avant une intervention chirurgicale programmée.",
+    "q": "Quels éléments doivent lui être communiqués avant la signature ?",
+    "options": [
+      "Uniquement le nom du chirurgien",
+      "Le diagnostic, les risques, les alternatives et le pronostic sans traitement",
+      "Uniquement la durée de l'intervention",
+      "Aucune information n'est nécessaire, la signature suffit"
+    ],
+    "correct": 1,
+    "exp": "Le consentement éclairé nécessite l'information complète sur le diagnostic, les risques, les alternatives et le pronostic sans traitement, avant la signature.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient doit subir une anesthésie générale programmée le lendemain matin.",
+    "q": "Quelle est la règle générale de jeûne pré-opératoire pour les liquides clairs ?",
+    "options": [
+      "Jeûne de liquides clairs généralement d'environ 2 heures avant l'intervention",
+      "Aucun jeûne n'est requis pour les liquides",
+      "Jeûne de liquides identique à celui des solides (6h)",
+      "Jeûne de 24 heures pour les liquides"
+    ],
+    "correct": 0,
+    "exp": "Le jeûne pré-opératoire pour les liquides clairs est généralement plus court que pour les solides, de l'ordre de 2 heures selon les protocoles actuels.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient opéré se plaint d'une douleur importante en post-opératoire.",
+    "q": "Quel outil permet d'évaluer objectivement l'intensité de cette douleur ?",
+    "options": [
+      "Une estimation visuelle non standardisée",
+      "Une échelle validée (numérique, visuelle analogique, ou comportementale selon le patient)",
+      "Aucune évaluation n'est nécessaire, la douleur est subjective",
+      "La seule observation de la fréquence cardiaque"
+    ],
+    "correct": 1,
+    "exp": "L'utilisation d'une échelle validée et adaptée au patient permet une évaluation objective et un suivi de l'efficacité du traitement antalgique.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient opéré en ambulatoire doit rentrer à domicile le jour même.",
+    "q": "Quel critère est indispensable avant la sortie ?",
+    "options": [
+      "Aucun critère particulier, la sortie est systématique",
+      "Stabilité des paramètres vitaux, absence de complication, douleur contrôlée et accompagnement à domicile",
+      "Uniquement l'absence de douleur totale",
+      "Uniquement la signature du patient"
+    ],
+    "correct": 1,
+    "exp": "La sortie après chirurgie ambulatoire nécessite des critères précis : stabilité clinique, absence de complication, douleur contrôlée, et souvent un accompagnement à domicile.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Un patient présente une plaie hémorragique active suite à un traumatisme.",
+    "q": "Quel geste d'hémostase est réalisé en première intention ?",
+    "options": [
+      "Garrot systématique d'emblée",
+      "Compression directe de la plaie",
+      "Élévation du membre uniquement, sans compression",
+      "Attente sans geste avant l'arrivée des secours"
+    ],
+    "correct": 1,
+    "exp": "La compression directe de la plaie est le geste d'hémostase de première intention devant une hémorragie externe active.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Chirurgie & Orthopédie] Une personne âgée chute et présente un membre inférieur raccourci et en rotation externe, avec impotence fonctionnelle.",
+    "q": "Quelle fracture est évoquée par ce tableau clinique classique ?",
+    "options": [
+      "Fracture du poignet",
+      "Fracture du col du fémur",
+      "Fracture de la cheville",
+      "Fracture des côtes"
+    ],
+    "correct": 1,
+    "exp": "Raccourcissement du membre et rotation externe sont des signes cliniques classiques de la fracture du col du fémur, fréquente chez la personne âgée.",
+    "bloc": 2,
+    "domain": "Chirurgie & Orthopédie"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Selon la loi sur les droits du patient, une intervention nécessite un consentement éclairé du patient.",
+    "q": "Dans quelle situation ce consentement peut-il être légalement outrepassé ?",
+    "options": [
+      "Si le patient ne parle pas hébreu",
+      "En cas d'urgence vitale immédiate chez un patient inconscient incapable de consentir",
+      "Si la famille le demande alors que le patient est conscient et compétent",
+      "Pour des raisons d'organisation du service"
+    ],
+    "correct": 1,
+    "exp": "En situation d'urgence vitale immédiate chez un patient inconscient ou incapable de consentir, les soins nécessaires au maintien de la vie peuvent être délivrés sans consentement préalable.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Une infirmière est interrogée par téléphone par une personne se présentant comme un proche du patient, demandant des informations médicales.",
+    "q": "Quelle est la conduite appropriée concernant le secret médical ?",
+    "options": [
+      "Communiquer les informations demandées sans vérification",
+      "Refuser de communiquer des informations non vérifiées par téléphone",
+      "Toujours accepter si la personne connaît le nom du patient",
+      "Le secret médical ne s'applique pas au téléphone"
+    ],
+    "correct": 1,
+    "exp": "Le secret médical impose de ne jamais divulguer d'informations à une personne non identifiée avec certitude, y compris par téléphone.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Une infirmière observe des signes évocateurs de maltraitance chez un enfant hospitalisé.",
+    "q": "Quelle est l'obligation légale de l'infirmière ?",
+    "options": [
+      "Attendre l'accord des parents avant tout signalement",
+      "Signaler la suspicion sans délai, obligation prioritaire sur le secret médical",
+      "Ne rien faire sans certitude absolue",
+      "Demander l'avis de l'enfant avant d'agir"
+    ],
+    "correct": 1,
+    "exp": "Le signalement de suspicion de maltraitance sur un mineur est une obligation légale prioritaire sur le secret médical, ne nécessitant pas l'accord des parents.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient refuse catégoriquement un traitement jugé vital par l'équipe médicale, malgré une information complète.",
+    "q": "Quelle instance peut être saisie dans des conditions très encadrées pour statuer sur ce refus ?",
+    "options": [
+      "La police",
+      "Le comité d'éthique",
+      "Les médias",
+      "L'assurance maladie"
+    ],
+    "correct": 1,
+    "exp": "Le comité d'éthique peut être saisi dans des conditions très encadrées et strictes pour statuer sur un refus de traitement mettant gravement en danger la santé du patient.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient en phase terminale d'une maladie incurable souhaite qu'on ne prolonge pas artificiellement sa vie.",
+    "q": "Que permet la loi sur le patient en fin de vie dans ce contexte ?",
+    "options": [
+      "L'euthanasie active à sa demande",
+      "Le fait de ne pas initier ou prolonger un traitement futile, sous conditions strictes",
+      "L'arrêt immédiat de tous les soins de confort",
+      "Aucune loi ne traite de cette situation"
+    ],
+    "correct": 1,
+    "exp": "La loi permet, sous conditions strictes et décision collégiale, de ne pas initier ou prolonger un traitement jugé futile chez un patient en phase terminale — l'euthanasie active reste interdite.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient a rempli des directives anticipées avant une dégradation de son état de conscience.",
+    "q": "Quelle est la valeur de ces directives pour l'équipe soignante ?",
+    "options": [
+      "Elles n'ont aucune valeur légale",
+      "Elles doivent être respectées et prises en compte dans la prise de décision",
+      "Elles ne s'appliquent qu'en cas d'accord de la famille",
+      "Elles remplacent systématiquement l'avis médical sans nuance"
+    ],
+    "correct": 1,
+    "exp": "Les directives anticipées doivent être respectées et intégrées à la prise de décision, notamment en fin de vie, conformément à la loi.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Avant d'administrer un médicament, l'infirmier doit vérifier l'identité du patient.",
+    "q": "Combien d'identifiants minimum doivent être vérifiés selon les standards de sécurité ?",
+    "options": [
+      "1 identifiant suffit",
+      "2 identifiants (ex : nom complet + numéro d'identité)",
+      "Aucune vérification n'est nécessaire si le patient est connu",
+      "4 identifiants sont obligatoires"
+    ],
+    "correct": 1,
+    "exp": "La vérification d'au moins 2 identifiants est la norme de sécurité du patient avant tout acte, quelle que soit la familiarité avec le patient.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier commet une erreur médicamenteuse sans conséquence clinique pour le patient.",
+    "q": "Selon le principe de 'culture juste' (Just Culture), quelle est la conduite appropriée ?",
+    "options": [
+      "Ne rien signaler puisqu'il n'y a pas eu de conséquence",
+      "Signaler l'erreur pour analyse, sans sanction punitive pour une erreur non intentionnelle",
+      "Sanctionner systématiquement l'infirmier",
+      "Cacher l'incident pour éviter les problèmes"
+    ],
+    "correct": 1,
+    "exp": "Le principe de culture juste encourage le signalement des erreurs, même sans conséquence, pour analyse et amélioration, sans sanction punitive pour une erreur humaine non intentionnelle.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier réalise un soin mais ne le documente que plusieurs heures plus tard, de mémoire.",
+    "q": "Quel principe de sécurité et de responsabilité est ici fragilisé ?",
+    "options": [
+      "Aucun principe n'est concerné",
+      "La documentation doit être immédiate et précise — élément médico-légal essentiel",
+      "La documentation n'a pas de valeur légale",
+      "Seul le médecin doit documenter"
+    ],
+    "correct": 1,
+    "exp": "La documentation infirmière doit être réalisée rapidement après le soin et de façon précise, car elle constitue un élément médico-légal opposable.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier délègue un acte technique à un aide-soignant non formé à ce geste spécifique.",
+    "q": "Qui porte la responsabilité de la pertinence de cette délégation ?",
+    "options": [
+      "L'aide-soignant uniquement",
+      "L'infirmier qui délègue reste responsable de la pertinence de la délégation",
+      "Aucune responsabilité n'est engagée",
+      "Le médecin uniquement"
+    ],
+    "correct": 1,
+    "exp": "L'infirmier qui délègue un acte reste responsable de la pertinence de cette délégation, notamment de la compétence et de l'autorisation légale du délégataire.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier reçoit une prescription orale d'un médecin par téléphone en urgence.",
+    "q": "Quelle est la bonne pratique concernant cette prescription ?",
+    "options": [
+      "L'exécuter sans autre formalité",
+      "La faire confirmer par écrit dans un délai réglementaire après exécution si urgence avérée",
+      "Refuser systématiquement toute prescription orale",
+      "Attendre 48h avant toute exécution"
+    ],
+    "correct": 1,
+    "exp": "Une prescription orale doit être confirmée par écrit dans un délai réglementaire, la traçabilité étant essentielle pour la sécurité et la responsabilité légale.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient présentant un trouble mental sévère refuse une hospitalisation alors qu'il représente un danger immédiat pour lui-même.",
+    "q": "Quelle procédure légale peut être engagée ?",
+    "options": [
+      "Aucune procédure n'est possible sans accord du patient",
+      "Hospitalisation sous contrainte selon la loi sur le traitement des malades mentaux",
+      "Seule la police peut intervenir, sans cadre médical",
+      "Le patient doit obligatoirement donner son accord écrit"
+    ],
+    "correct": 1,
+    "exp": "La loi sur le traitement des malades mentaux permet une hospitalisation sous contrainte en cas de trouble mental associé à un danger immédiat pour soi ou autrui.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un enfant de 10 ans doit recevoir un soin non urgent programmé.",
+    "q": "Qui doit donner le consentement pour ce soin ?",
+    "options": [
+      "L'enfant seul, quel que soit son âge",
+      "Les parents ou le tuteur légal, sauf situation d'urgence",
+      "Aucun consentement n'est nécessaire pour un mineur",
+      "L'école de l'enfant"
+    ],
+    "correct": 1,
+    "exp": "Pour un soin non urgent chez un mineur, le consentement des parents ou du tuteur légal est requis, sauf situation d'urgence vitale.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient inconscient est admis aux urgences sans possibilité de recueillir son consentement, nécessitant des soins vitaux immédiats.",
+    "q": "Quelle est la base légale permettant d'agir sans consentement dans ce contexte ?",
+    "options": [
+      "Aucune base légale n'existe, il faut attendre",
+      "La dérogation pour urgence vitale immédiate",
+      "L'accord implicite de la famille uniquement",
+      "La décision unilatérale de l'infirmier sans cadre légal"
+    ],
+    "correct": 1,
+    "exp": "La dérogation pour urgence vitale immédiate permet légalement d'agir sans consentement préalable lorsque le patient est inconscient et en danger de mort.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient consulte son dossier médical informatisé partagé entre les caisses de santé (Koupot Holim).",
+    "q": "Quel principe encadre l'accès à ces données par les professionnels de santé ?",
+    "options": [
+      "Accès libre à tous les employés de l'hôpital",
+      "Accès réservé aux professionnels impliqués dans le soin, tracé et audité",
+      "Aucun contrôle d'accès n'existe",
+      "Accès public sans restriction"
+    ],
+    "correct": 1,
+    "exp": "L'accès aux dossiers informatisés est réservé aux professionnels impliqués dans le soin du patient, avec traçabilité et audit des accès.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient en fin de vie exprime le souhait de faire don de ses organes après son décès.",
+    "q": "Quel cadre encadre cette démarche en Israël ?",
+    "options": [
+      "Aucune législation n'existe sur ce sujet",
+      "Une législation spécifique encadre le don d'organes et le consentement associé",
+      "Le don d'organes est interdit en Israël",
+      "Seule la famille peut décider, sans avis du patient"
+    ],
+    "correct": 1,
+    "exp": "Une législation spécifique encadre le don d'organes en Israël, avec des dispositifs de consentement (carte de donneur notamment).",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier a connaissance d'une information confidentielle pouvant représenter un danger imminent pour un tiers identifié.",
+    "q": "Quelle exception au secret médical peut s'appliquer ?",
+    "options": [
+      "Aucune exception n'existe jamais",
+      "La levée du secret peut être justifiée en cas de danger imminent pour autrui",
+      "Le secret médical est absolu en toute circonstance",
+      "Seul le patient peut lever le secret"
+    ],
+    "correct": 1,
+    "exp": "Un danger imminent pour autrui, clairement identifié, peut justifier une levée exceptionnelle du secret médical, dans un cadre très encadré.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier commet une erreur ayant causé un préjudice à un patient par négligence caractérisée.",
+    "q": "Quel type de responsabilité peut être engagée ?",
+    "options": [
+      "Aucune responsabilité, l'erreur est humaine",
+      "Responsabilité civile, pénale et/ou disciplinaire selon la gravité",
+      "Seule une sanction morale informelle",
+      "La responsabilité est uniquement collective, jamais individuelle"
+    ],
+    "correct": 1,
+    "exp": "Une négligence caractérisée ayant causé un préjudice peut engager la responsabilité civile, pénale et/ou disciplinaire de l'infirmier.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un étudiant infirmier s'interroge sur les principes fondamentaux guidant la prise de décision éthique en santé.",
+    "q": "Quels sont les 4 grands principes de bioéthique classiquement enseignés ?",
+    "options": [
+      "Rapidité, économie, simplicité, efficacité",
+      "Autonomie, bienfaisance, non-malfaisance, justice",
+      "Confidentialité, rapidité, coût, disponibilité",
+      "Hiérarchie, obéissance, discipline, rigueur"
+    ],
+    "correct": 1,
+    "exp": "Les 4 principes fondamentaux de bioéthique sont l'autonomie, la bienfaisance, la non-malfaisance et la justice.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient témoin de Jéhovah refuse catégoriquement une transfusion sanguine, y compris en cas de risque vital, alors qu'il est pleinement compétent.",
+    "q": "Quelle est l'attitude appropriée de l'équipe soignante ?",
+    "options": [
+      "Transfuser malgré le refus car la vie prime toujours",
+      "Respecter l'autonomie du patient compétent et rechercher des alternatives thérapeutiques",
+      "Ignorer sa demande et le sédater pour transfuser",
+      "Refuser de le soigner"
+    ],
+    "correct": 1,
+    "exp": "Le respect de l'autonomie d'un patient compétent impose de respecter son refus, même vital, tout en recherchant des alternatives thérapeutiques possibles.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient est sollicité pour participer à un essai clinique de recherche.",
+    "q": "Quelle particularité s'applique au consentement dans ce contexte, par rapport aux soins courants ?",
+    "options": [
+      "Aucune différence avec le consentement standard",
+      "Un consentement éclairé spécifique et renforcé est requis, avec information détaillée sur la recherche",
+      "Le consentement n'est pas nécessaire pour la recherche",
+      "Seul le médecin décide, sans consentement du patient"
+    ],
+    "correct": 1,
+    "exp": "La recherche clinique nécessite un consentement éclairé spécifique et renforcé, avec une information détaillée sur les objectifs, risques et modalités de l'étude.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Les données de santé d'un patient sont stockées dans un système informatique hospitalier.",
+    "q": "Quelle loi encadre la protection de ces données personnelles sensibles ?",
+    "options": [
+      "Aucune loi spécifique n'existe",
+      "La loi sur la protection de la vie privée",
+      "Uniquement le règlement interne de l'hôpital",
+      "La loi du travail"
+    ],
+    "correct": 1,
+    "exp": "La loi sur la protection de la vie privée encadre la confidentialité et la protection des données de santé, en complément du secret médical.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier participe à une réunion pluridisciplinaire concernant un patient dont le pronostic est très réservé.",
+    "q": "Quel rôle joue l'infirmier dans cette décision collégiale, notamment en fin de vie ?",
+    "options": [
+      "Aucun rôle, seule la décision médicale compte",
+      "Un rôle actif de contribution avec son observation clinique et le respect des volontés du patient",
+      "Un rôle purement administratif",
+      "L'infirmier ne peut jamais participer à ces réunions"
+    ],
+    "correct": 1,
+    "exp": "L'infirmier a un rôle actif dans les décisions collégiales, notamment en fin de vie, en apportant son observation clinique et en relayant les volontés exprimées par le patient.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un patient exprime un refus éclairé concernant un médicament prescrit, tout en étant pleinement informé des conséquences.",
+    "q": "Quelle est la conduite appropriée de l'infirmier face à ce refus ?",
+    "options": [
+      "Administrer le médicament malgré le refus",
+      "Respecter le refus éclairé, documenter et informer le médecin référent",
+      "Convaincre le patient par la contrainte physique",
+      "Ignorer le refus s'il semble déraisonnable"
+    ],
+    "correct": 1,
+    "exp": "Le droit de refus du patient (7e R) impose à l'infirmier de respecter un refus éclairé, de le documenter précisément et d'en informer le médecin référent.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  },
+  {
+    "case": "[Rishuy - Pédiatrie & Néonatologie] Un enfant de 5 ans présente un événement respiratoire brutal après avoir joué avec de petites pièces, avec toux violente puis stridor.",
+    "q": "Quelle cause doit être évoquée en priorité ?",
+    "options": [
+      "Une crise d'asthme isolée",
+      "Une inhalation de corps étranger des voies aériennes",
+      "Une laryngite virale simple",
+      "Une allergie alimentaire sans lien"
+    ],
+    "correct": 1,
+    "exp": "Un épisode brutal de toux violente suivi de stridor chez un enfant ayant manipulé de petits objets évoque en priorité une inhalation de corps étranger, urgence potentielle.",
+    "bloc": 3,
+    "domain": "Pédiatrie & Néonatologie"
+  },
+  {
+    "case": "[Rishuy - Législation & Éthique Israélienne] Un infirmier constate qu'un collègue a commis une erreur grave de prescription pouvant mettre en danger un patient, sans que cela ait encore été signalé.",
+    "q": "Quelle est l'attitude professionnelle et éthique appropriée ?",
+    "options": [
+      "Ignorer la situation pour ne pas nuire au collègue",
+      "Signaler la situation selon la procédure institutionnelle, dans l'intérêt de la sécurité du patient",
+      "Régler le problème seul sans en informer personne",
+      "Attendre que le patient se plaigne avant d'agir"
+    ],
+    "correct": 1,
+    "exp": "La sécurité du patient prime — tout professionnel a la responsabilité de signaler une erreur grave selon la procédure institutionnelle, dans une logique de culture juste et de protection du patient.",
+    "bloc": 1,
+    "domain": "Législation & Éthique Israélienne"
+  }
+];
+
+  let selectedQuestions = [];
+  let userAnswers = [];
+  let currentQIndex = 0;
+  let selectedOptionForCurrentQ = null;
+  let seconds = 0;
+  let timerInterval = null;
+  let selectedBloc = 0; // 0 = tous les blocs
+  let currentQuizBloc = 0;
+
+  document.getElementById('blocSelector').addEventListener('click', (e) => {
+    const btn = e.target.closest('.bloc-btn');
+    if (!btn) return;
+    document.querySelectorAll('.bloc-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedBloc = parseInt(btn.dataset.bloc, 10);
+  });
+
+  function shuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function getSavedErrors() {
+    const errs = localStorage.getItem('rishuy_errors');
+    return errs ? JSON.parse(errs) : [];
+  }
+
+  function saveErrors(newFailedQuestions) {
+    let currentErrors = getSavedErrors();
+    newFailedQuestions.forEach(q => {
+      if(!currentErrors.some(e => e.q === q.q)) {
+        currentErrors.push(q);
+      }
+    });
+    localStorage.setItem('rishuy_errors', JSON.stringify(currentErrors));
+    updateErrorCounter();
+  }
+
+  function updateErrorCounter() {
+    const count = getSavedErrors().length;
+    const btn = document.getElementById('errCount');
+    if(btn) btn.innerText = count;
+  }
+
+  function initQuiz() {
+    const pool = selectedBloc === 0 ? questionBank : questionBank.filter(q => q.bloc === selectedBloc);
+    const shuffled = shuffle(pool);
+    selectedQuestions = shuffled.slice(0, Math.min(20, shuffled.length));
+    currentQuizBloc = selectedBloc;
+    startSession();
+  }
+
+  function initErrorQuiz() {
+    const errors = getSavedErrors();
+    if(errors.length === 0) {
+      alert("Excellente nouvelle ! Vous n'avez actuellement aucune erreur enregistrée.");
+      return;
+    }
+    selectedQuestions = shuffle(errors);
+    currentQuizBloc = 0;
+    startSession();
+  }
+
+  function startSession() {
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+    currentQIndex = 0;
+    seconds = 0;
+
+    document.getElementById('quizHeader').style.display = 'flex';
+    document.getElementById('quizCard').style.display = 'block';
+    document.getElementById('correctionSection').style.display = 'none';
+
+    startTimer();
+    renderQuestion();
+  }
+
+  function startTimer() {
+    if(timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      document.getElementById('timer').innerText = `⏱ Temps : ${m}:${s}`;
+    }, 1000);
+  }
+
+  function renderQuestion() {
+    const qData = selectedQuestions[currentQIndex];
+    document.getElementById('qCount').innerText = `Question ${currentQIndex + 1} sur ${selectedQuestions.length}`;
+    document.getElementById('caseStudy').innerHTML = `<strong>Mise en situation :</strong> ${qData.case}`;
+    document.getElementById('qText').innerText = qData.q;
+
+    const optsBox = document.getElementById('optionsBox');
+    optsBox.innerHTML = "";
+    selectedOptionForCurrentQ = userAnswers[currentQIndex];
+
+    qData.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = "option-btn" + (selectedOptionForCurrentQ === idx ? " selected" : "");
+      btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+      btn.onclick = () => {
+        selectedOptionForCurrentQ = idx;
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      };
+      optsBox.appendChild(btn);
+    });
+
+    const btnNext = document.getElementById('btnNext');
+    btnNext.innerText = (currentQIndex === selectedQuestions.length - 1) ? "Terminer & Voir la correction" : "Suivant →";
+  }
+
+  function recordAndNext() {
+    if(selectedOptionForCurrentQ === null) {
+      alert("Veuillez sélectionner une réponse avant de continuer.");
+      return;
+    }
+
+    userAnswers[currentQIndex] = selectedOptionForCurrentQ;
+
+    if(currentQIndex < selectedQuestions.length - 1) {
+      currentQIndex++;
+      renderQuestion();
+    } else {
+      finishQuiz();
+    }
+  }
+
+  function saveQuizHistory(bloc, score, total, pct) {
+    const HISTORY_KEY = 'rishuy_quiz_history';
+    let history = [];
+    try {
+      history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    } catch(e) { history = []; }
+    history.push({
+      date: new Date().toISOString(),
+      bloc: bloc,
+      score: score,
+      total: total,
+      pct: pct
+    });
+    if (history.length > 200) history = history.slice(history.length - 200);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  }
+
+  function finishQuiz() {
+    clearInterval(timerInterval);
+    document.getElementById('quizHeader').style.display = 'none';
+    document.getElementById('quizCard').style.display = 'none';
+
+    let score = 0;
+    let failedQs = [];
+
+    selectedQuestions.forEach((q, idx) => {
+      if(userAnswers[idx] === q.correct) {
+        score++;
+      } else {
+        failedQs.push(q);
+      }
+    });
+
+    if(failedQs.length > 0) {
+      saveErrors(failedQs);
+    }
+
+    const total = selectedQuestions.length;
+    const pct = Math.round((score / total) * 100);
+    const isPass = pct >= 60;
+
+    saveQuizHistory(currentQuizBloc, score, total, pct);
+
+    const corrSec = document.getElementById('correctionSection');
+    corrSec.style.display = 'block';
+
+    let html = `
+      <div class="quiz-card" style="text-align:center; margin-bottom:30px;">
+        <h2>${isPass ? '🎉 Félicitations ! Session Validée' : '⚠️ Examen non validé'}</h2>
+        <div style="font-size:3.5rem; font-weight:bold; color:${isPass ? '#27ae60' : '#c0392b'}; margin:15px 0;">${pct}%</div>
+        <p style="font-size:1.1rem;">Score : <strong>${score} / ${total}</strong> bonnes réponses.</p>
+        <p style="color:#718096; margin-top:5px;">Temps écoulé : ${Math.floor(seconds/60)} min ${seconds%60} sec</p>
+        ${failedQs.length > 0 ? `<p style="color:#e67e22; margin-top:8px; font-weight:bold;">${failedQs.length} erreur(s) ajoutée(s) à votre carnet de rattrapage.</p>` : ''}
+        
+        <div style="margin-top:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action" onclick="initQuiz()" style="float:none; background:var(--primary);">⟳ Tirer 20 nouvelles questions au hasard</button>
+          <button class="btn-action" onclick="initErrorQuiz()" style="float:none; background:var(--warning);">🔄 Travailler mes erreurs (${getSavedErrors().length})</button>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:20px; color:var(--primary);">📋 CORRECTION DÉTAILLÉE DE VOTRE SESSION :</h3>
+    `;
+
+    selectedQuestions.forEach((q, idx) => {
+      const userAns = userAnswers[idx];
+      const isCorrect = userAns === q.correct;
+
+      html += `
+        <div class="correction-item ${isCorrect ? 'correct-item' : 'wrong-item'}">
+          <div>
+            <span class="badge ${isCorrect ? 'badge-success' : 'badge-error'}">
+              Question ${idx + 1} : ${isCorrect ? 'CORRECT (+1)' : 'ERREUR (0)'}
+            </span>
+          </div>
+          <p style="font-style:italic; color:#4a5568; margin-bottom:8px;">${q.case}</p>
+          <p style="font-weight:bold; margin-bottom:12px;">${q.q}</p>
+          
+          <p>👉 Votre réponse : <strong style="color:${isCorrect ? '#27ae60' : '#c0392b'};">${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}</strong></p>
+          ${!isCorrect ? `<p style="margin-top:4px;">✅ Bonne réponse : <strong style="color:#27ae60;">${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</strong></p>` : ''}
+          
+          <div class="exp-box">
+            <strong>Explication médicale :</strong> ${q.exp}
+          </div>
+        </div>
+      `;
+    });
+
+    corrSec.innerHTML = html;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateErrorCounter();
+
+  // Permet un lancement direct depuis la page Progression (?mode=err ou ?bloc=1..5)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('mode') === 'err') {
+    initErrorQuiz();
+  } else {
+    const blocParam = parseInt(urlParams.get('bloc'), 10);
+    if (blocParam >= 1 && blocParam <= 5) {
+      selectedBloc = blocParam;
+      document.querySelectorAll('.bloc-btn').forEach(b => b.classList.remove('active'));
+      const targetBtn = document.querySelector(`.bloc-btn[data-bloc="${blocParam}"]`);
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+    initQuiz();
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma Progression - Rishuy</title>
+<style>
+  :root {
+    --primary: #1b2a47; --accent: #0f4c81; --bg: #f4f6f9; --card-bg: #ffffff;
+    --text: #2c3e50; --border: #e2e8f0; --success: #27ae60; --warning: #e67e22; --error: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+  header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+  header h1 { font-size: 2rem; margin-bottom: 6px; }
+  header p { opacity: 0.85; margin-bottom: 25px; }
+
+  .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 950px; margin: 0 auto; backdrop-filter: blur(5px); flex-wrap: wrap; }
+  .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+  .nav-tab:hover { background: rgba(255,255,255,0.2); }
+  .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+  .container { max-width: 950px; margin: 30px auto 0; padding: 0 20px; }
+  .section-card { background: var(--card-bg); border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+  h2 { color: var(--primary); margin-bottom: 18px; font-size: 1.25rem; }
+
+  .overallBar { background: #eef2f7; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+  .overallTop { display:flex; justify-content:space-between; margin-bottom:8px; font-weight:700; color: var(--primary); }
+  .barBg { height: 14px; background: #dde3ea; border-radius: 7px; overflow: hidden; }
+  .barFill { height: 100%; background: var(--accent); border-radius: 7px; transition: width 0.4s; }
+
+  .blocGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  .blocMini { background: #fafbfc; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .blocMini .name { font-weight: 700; color: var(--primary); font-size: 0.9rem; margin-bottom: 8px; }
+  .blocMini .frac { font-size: 0.8rem; color: #64748b; margin-top: 6px; }
+  .miniBarBg { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+  .miniBarFill { height: 100%; border-radius: 4px; }
+
+  .statsRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .statBox { background: #fafbfc; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+  .statBox .num { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+  .statBox .lbl { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
+
+  .quizBlocRow { display:flex; align-items:center; gap: 12px; margin-bottom: 12px; }
+  .quizBlocRow .qlabel { width: 170px; font-size: 0.85rem; font-weight: 600; color: var(--text); flex-shrink:0; }
+  .quizBlocRow .qbar { flex: 1; }
+  .quizBlocRow .qpct { width: 50px; text-align: right; font-weight: 700; font-size: 0.85rem; }
+
+  .btn { display: inline-block; background: var(--accent); color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem; border: none; cursor: pointer; transition: background 0.2s; }
+  .btn:hover { background: #0b3861; }
+  .btn-danger { background: var(--error); }
+  .btn-danger:hover { background: #922b21; }
+  .btn-warning { background: var(--warning); }
+  .btn-warning:hover { background: #c25e0f; }
+
+  .emptyState { text-align: center; color: #94a3b8; padding: 20px; font-style: italic; }
+
+  .sessionsList { max-height: 260px; overflow-y: auto; }
+  .sessionRow { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
+  .sessionRow:last-child { border-bottom: none; }
+  .sessionBadge { padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 0.78rem; color: #fff; }
+
+  @media (max-width: 768px) { .main-nav { flex-direction: column; } .quizBlocRow .qlabel { width: 110px; font-size: 0.78rem; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PRÉPARATION RISHUY (רישוי)</h1>
+  <p>Ma progression — vue d'ensemble des révisions</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab">🧠 Quiz d'Entraînement</a>
+    <a href="outils.html" class="nav-tab">⚡ Flash-Analyse & Normes</a>
+    <a href="progression.html" class="nav-tab active">📊 Progression</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- FICHES LUES -->
+  <div class="section-card">
+    <h2>📚 Fiches de révision lues</h2>
+    <div class="overallBar">
+      <div class="overallTop">
+        <span id="overallLabel">0 / 43 fiches lues au total</span>
+        <span id="overallPct">0%</span>
+      </div>
+      <div class="barBg"><div class="barFill" id="overallFill" style="width:0%"></div></div>
+    </div>
+    <div class="blocGrid" id="blocGrid"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="section-card">
+    <h2>🧠 Résultats aux quiz</h2>
+    <div class="statsRow" id="quizStatsRow"></div>
+    <div id="quizByBloc"></div>
+    <div id="noQuizData" class="emptyState" style="display:none;">Aucune session de quiz enregistrée pour le moment — lance une série depuis l'onglet Quiz !</div>
+  </div>
+
+  <!-- ERREURS -->
+  <div class="section-card">
+    <h2>🔄 Carnet de rattrapage</h2>
+    <div class="statsRow">
+      <div class="statBox">
+        <div class="num" id="errCount">0</div>
+        <div class="lbl">question(s) à retravailler</div>
+      </div>
+    </div>
+    <a href="quiz.html?mode=err" class="btn btn-warning" id="reviewErrBtn">🔄 Revoir mes erreurs maintenant</a>
+  </div>
+
+  <!-- HISTORIQUE RECENT -->
+  <div class="section-card">
+    <h2>🕓 Dernières sessions</h2>
+    <div class="sessionsList" id="sessionsList"></div>
+  </div>
+
+  <!-- RESET -->
+  <div class="section-card" style="text-align:center;">
+    <p style="color:#64748b; font-size:0.85rem; margin-bottom:12px;">Toutes les données sont stockées uniquement sur cet appareil (aucun compte, aucun serveur).</p>
+    <button class="btn btn-danger" onclick="resetProgress()">🗑️ Réinitialiser toute ma progression</button>
+  </div>
+
+</div>
+
+<script>
+  const BLOC_NAMES = {
+    1: "Bloc 1 — Législation",
+    2: "Bloc 2 — Médecine/Chir.",
+    3: "Bloc 3 — Mère/Enfant",
+    4: "Bloc 4 — Santé mentale",
+    5: "Bloc 5 — Pharmaco"
+  };
+  const BLOC_FICHE_COUNTS = { 1: 5, 2: 13, 3: 11, 4: 7, 5: 7 };
+  const BLOC_COLORS = { 1: "#0f4c81", 2: "#c0392b", 3: "#8e44ad", 4: "#16a085", 5: "#c46b0e" };
+
+  function pctColor(pct) {
+    if (pct >= 75) return "#27ae60";
+    if (pct >= 50) return "#e67e22";
+    return "#c0392b";
+  }
+
+  function loadJSON(key, fallback) {
+    try {
+      const v = JSON.parse(localStorage.getItem(key));
+      return v === null || v === undefined ? fallback : v;
+    } catch (e) { return fallback; }
+  }
+
+  function renderFiches() {
+    const readState = loadJSON('rishuy_read_fiches', {});
+    const grid = document.getElementById('blocGrid');
+    grid.innerHTML = "";
+    let totalRead = 0, totalAll = 0;
+
+    Object.keys(BLOC_FICHE_COUNTS).forEach(blocNum => {
+      const total = BLOC_FICHE_COUNTS[blocNum];
+      let read = 0;
+      for (let i = 1; i <= total; i++) {
+        if (readState[`bloc${blocNum}-f${i}`]) read++;
+      }
+      totalRead += read;
+      totalAll += total;
+      const pct = Math.round((read / total) * 100);
+
+      const div = document.createElement('div');
+      div.className = 'blocMini';
+      div.innerHTML = `
+        <div class="name">${BLOC_NAMES[blocNum]}</div>
+        <div class="miniBarBg"><div class="miniBarFill" style="width:${pct}%; background:${BLOC_COLORS[blocNum]};"></div></div>
+        <div class="frac">${read} / ${total} fiches (${pct}%)</div>
+      `;
+      grid.appendChild(div);
+    });
+
+    const overallPct = totalAll ? Math.round((totalRead / totalAll) * 100) : 0;
+    document.getElementById('overallLabel').textContent = `${totalRead} / ${totalAll} fiches lues au total`;
+    document.getElementById('overallPct').textContent = overallPct + '%';
+    document.getElementById('overallFill').style.width = overallPct + '%';
+  }
+
+  function renderQuiz() {
+    const history = loadJSON('rishuy_quiz_history', []);
+    const statsRow = document.getElementById('quizStatsRow');
+    const byBloc = document.getElementById('quizByBloc');
+    const noData = document.getElementById('noQuizData');
+    const sessionsList = document.getElementById('sessionsList');
+
+    if (history.length === 0) {
+      statsRow.innerHTML = "";
+      byBloc.innerHTML = "";
+      noData.style.display = 'block';
+      sessionsList.innerHTML = '<div class="emptyState">Aucune session pour le moment.</div>';
+      return;
+    }
+    noData.style.display = 'none';
+
+    const totalSessions = history.length;
+    const totalQuestions = history.reduce((s, h) => s + h.total, 0);
+    const totalCorrect = history.reduce((s, h) => s + h.score, 0);
+    const globalPct = totalQuestions ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+
+    statsRow.innerHTML = `
+      <div class="statBox"><div class="num">${totalSessions}</div><div class="lbl">séries réalisées</div></div>
+      <div class="statBox"><div class="num" style="color:${pctColor(globalPct)}">${globalPct}%</div><div class="lbl">score moyen global</div></div>
+      <div class="statBox"><div class="num">${totalQuestions}</div><div class="lbl">questions répondues</div></div>
+    `;
+
+    // Moyenne par bloc (bloc = 0 correspond aux séries "tous les blocs", exclues du détail par bloc)
+    let rows = "";
+    Object.keys(BLOC_NAMES).forEach(blocNum => {
+      const sessions = history.filter(h => String(h.bloc) === String(blocNum));
+      if (sessions.length === 0) return;
+      const q = sessions.reduce((s, h) => s + h.total, 0);
+      const c = sessions.reduce((s, h) => s + h.score, 0);
+      const pct = Math.round((c / q) * 100);
+      rows += `
+        <div class="quizBlocRow">
+          <div class="qlabel">${BLOC_NAMES[blocNum]}</div>
+          <div class="qbar barBg"><div class="barFill" style="width:${pct}%; background:${pctColor(pct)};"></div></div>
+          <div class="qpct" style="color:${pctColor(pct)}">${pct}%</div>
+        </div>`;
+    });
+    const mixedSessions = history.filter(h => String(h.bloc) === "0");
+    if (mixedSessions.length > 0) {
+      const q = mixedSessions.reduce((s, h) => s + h.total, 0);
+      const c = mixedSessions.reduce((s, h) => s + h.score, 0);
+      const pct = Math.round((c / q) * 100);
+      rows += `
+        <div class="quizBlocRow">
+          <div class="qlabel">🎲 Tous blocs mélangés</div>
+          <div class="qbar barBg"><div class="barFill" style="width:${pct}%; background:${pctColor(pct)};"></div></div>
+          <div class="qpct" style="color:${pctColor(pct)}">${pct}%</div>
+        </div>`;
+    }
+    byBloc.innerHTML = rows;
+
+    // Dernières sessions (10 plus récentes)
+    const recent = [...history].reverse().slice(0, 10);
+    sessionsList.innerHTML = recent.map(h => {
+      const d = new Date(h.date);
+      const dateStr = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const label = h.bloc == 0 ? "Tous blocs" : (BLOC_NAMES[h.bloc] || `Bloc ${h.bloc}`);
+      return `<div class="sessionRow">
+        <span>${dateStr} — ${label}</span>
+        <span class="sessionBadge" style="background:${pctColor(h.pct)}">${h.score}/${h.total} (${h.pct}%)</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderErrors() {
+    const errors = loadJSON('rishuy_errors', []);
+    document.getElementById('errCount').textContent = errors.length;
+    const btn = document.getElementById('reviewErrBtn');
+    if (errors.length === 0) {
+      btn.style.opacity = '0.5';
+      btn.style.pointerEvents = 'none';
+      btn.textContent = '✅ Aucune erreur à retravailler pour le moment';
+    }
+  }
+
+  function resetProgress() {
+    if (!confirm("Ceci effacera définitivement les fiches lues, l'historique des quiz et les erreurs sauvegardées sur cet appareil. Continuer ?")) return;
+    localStorage.removeItem('rishuy_read_fiches');
+    localStorage.removeItem('rishuy_quiz_history');
+    localStorage.removeItem('rishuy_errors');
+    renderAll();
+  }
+
+  function renderAll() {
+    renderFiches();
+    renderQuiz();
+    renderErrors();
+  }
+
+  document.addEventListener('DOMContentLoaded', renderAll);
+</script>
+
+</body>
+</html>

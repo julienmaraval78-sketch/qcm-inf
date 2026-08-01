@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outils Pratiques & Cas Cliniques - Rishuy</title>
+  <style>
+    :root { --primary: #1b2a47; --accent: #0f4c81; --bg: #f4f6f9; --card-bg: #ffffff; --text: #2c3e50; --border: #e2e8f0; --warning: #e67e22; --danger: #c0392b; --success: #27ae60; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    
+    header { background: linear-gradient(135deg, #16243d 0%, #1b2a47 100%); color: white; padding: 30px 20px 20px; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 6px; }
+    header p { opacity: 0.85; margin-bottom: 25px; }
+
+    .main-nav { display: flex; justify-content: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px; border-radius: 12px; max-width: 900px; margin: 0 auto; backdrop-filter: blur(5px); flex-wrap: wrap; }
+    .nav-tab { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #1b2a47; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+    .container { max-width: 900px; margin: 30px auto 0; padding: 0 20px; }
+    .section-card { background: var(--card-bg); border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    
+    h2 { color: var(--primary); margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+    .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: var(--accent); }
+
+    /* Flash-Analyse */
+    .case-box { background: #f8fafc; border-left: 4px solid var(--accent); padding: 15px; border-radius: 4px; font-size: 1.05rem; line-height: 1.5; margin: 15px 0; }
+    .solution-box { background: #eef2ff; border: 1px solid #c7d2fe; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+
+    /* Analyseur de Normes */
+    .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .input-group { display: flex; flex-direction: column; gap: 5px; }
+    .input-group label { font-size: 0.85rem; font-weight: bold; color: #475569; }
+    .input-group input { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; }
+    
+    .result-alert { padding: 12px; border-radius: 6px; margin-top: 10px; font-weight: 500; font-size: 0.95rem; }
+    .alert-normal { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+    @media (max-width: 768px) { .main-nav { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>FLASH-ANALYSE & NORMES BIOLOGIQUES</h1>
+  <p>Entraînement rapide sur cas réflexes et interprétation des bilans</p>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-tab">📄 Fiches de Révision</a>
+    <a href="calculatrice.html" class="nav-tab">🧮 Calculette Posologies</a>
+    <a href="dictionnaire.html" class="nav-tab">🗣️ Dictionnaire Hébreu</a>
+    <a href="quiz.html" class="nav-tab">🧠 Quiz d'Entraînement</a>
+    <a href="outils.html" class="nav-tab active">⚡ Flash-Analyse & Normes</a>
+    <a href="progression.html" class="nav-tab">📊 Progression</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- POINT 3: FLASH-ANALYSE -->
+  <div class="section-card">
+    <h2>🚨 1. Flash-Analyse (Cas Clinique Réflexe)</h2>
+    <p style="font-size:0.9rem; color:#64748b;">Testez vos réflexes en tirant un cas d'urgence au hasard. Prenez 30 secondes pour y réfléchir puis vérifiez la prise en charge.</p>
+    
+    <div class="case-box" id="caseBox">Cliquez sur le bouton ci-dessous pour générer un cas clinique.</div>
+    
+    <button class="btn" onclick="getRandomCase()">🎲 Tirer un cas au hasard</button>
+    <button class="btn" style="background:#475569; display:none;" id="btnSolution" onclick="toggleSolution()">💡 Voir la Conduite à Tenir</button>
+
+    <div class="solution-box" id="solutionBox"></div>
+  </div>
+
+  <!-- POINT 4: NORMES ET CONSTANTES -->
+  <div class="section-card">
+    <h2>🧪 2. Analyseur Interactif de Normes Sanguines</h2>
+    <p style="font-size:0.9rem; color:#64748b; margin-bottom:15px;">Entrez une valeur biologique pour vérifier si elle est dans la norme et connaître la réaction infirmière attendue :</p>
+    
+    <div class="grid-inputs">
+      <div class="input-group">
+        <label>Potassium (K+) [3.5 - 5.0 mmol/L]</label>
+        <input type="number" step="0.1" id="inputK" placeholder="Ex: 6.2" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Sodium (Na+) [135 - 145 mmol/L]</label>
+        <input type="number" id="inputNa" placeholder="Ex: 122" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>INR (Sous AVK) [2.0 - 3.0]</label>
+        <input type="number" step="0.1" id="inputINR" placeholder="Ex: 5.5" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Glycémie [0.70 - 1.10 g/L]</label>
+        <input type="number" step="0.01" id="inputGly" placeholder="Ex: 0.45" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Calcémie (Ca2+) [2.2 - 2.6 mmol/L]</label>
+        <input type="number" step="0.01" id="inputCa" placeholder="Ex: 1.8" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Hémoglobine [12 - 16 g/dL]</label>
+        <input type="number" step="0.1" id="inputHb" placeholder="Ex: 7.5" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Créatininémie [45 - 90 µmol/L]</label>
+        <input type="number" id="inputCrea" placeholder="Ex: 250" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Plaquettes [150 - 400 x10⁹/L]</label>
+        <input type="number" id="inputPlaq" placeholder="Ex: 40" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>CRP [< 5 mg/L]</label>
+        <input type="number" id="inputCRP" placeholder="Ex: 180" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Leucocytes [4 - 10 x10⁹/L]</label>
+        <input type="number" step="0.1" id="inputGB" placeholder="Ex: 0.4" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>Lipasémie [< 60 U/L]</label>
+        <input type="number" id="inputLipase" placeholder="Ex: 350" oninput="analyzeLab()">
+      </div>
+      <div class="input-group">
+        <label>SpO2 [95 - 100 %]</label>
+        <input type="number" id="inputSpO2" placeholder="Ex: 86" oninput="analyzeLab()">
+      </div>
+    </div>
+
+    <div id="labResults"></div>
+  </div>
+
+</div>
+
+<script>
+  // BANK DES CAS REFLÈXES
+  const flashCases = [
+    {
+      text: "Patient de 58 ans aux urgences, se plaint d'une douleur rétrosternale constrictive irradiant dans la mâchoire depuis 45 minutes, accompagnée de sueurs.",
+      sol: "<strong>Diagnostic suspecté :</strong> Syndrome Coronarien Aigu (SCA / Infarctus).<br><strong>Actions immédiates :</strong> 1. ECG 12 dérivations en <10 min. 2. Repos strict au lit. 3. Pose voie veineuse. 4. Préparer Aspirine + Dérivés nitrés sur ordre médical. 5. Monitorage ECG continu."
+    },
+    {
+      text: "Nourrisson de 8 mois ramené par sa mère pour léthargie, yeux enfoncés, pli cutané persistant et absence de larmes lors des pleurs.",
+      sol: "<strong>Diagnostic suspecté :</strong> Déshydratation aiguë sévère.<br><strong>Actions immédiates :</strong> 1. Pesée immédiate (comparer au poids antérieur). 2. Évaluer la fontanelle. 3. Pose de voie veineuse d'urgence pour réhydratation IV rapide ou SNG si échec."
+    },
+    {
+      text: "Patient opéré de la hanche à J+3, présente soudainement une douleur thoracique brutale à l'inspiration, une dyspnée aiguë et une tachycardie à 120 bpm.",
+      sol: "<strong>Diagnostic suspecté :</strong> Embolie Pulmonaire.<br><strong>Actions immédiates :</strong> 1. Position demi-assise. 2. Oxygénothérapie haut débit. 3. Alerte médicale immédiate. 4. Préparer Bilan sanguin (D-Dimères, Gaz du sang) et Héparine IV."
+    },
+    {
+      text: "Patient de 70 ans hospitalisé, sous héparine IV, présente des gencives qui saignent spontanément et des hématomes diffus. TCA très allongé au dernier bilan.",
+      sol: "<strong>Diagnostic suspecté :</strong> Surdosage en héparine non fractionnée.<br><strong>Actions immédiates :</strong> 1. Alerter le médecin sans délai. 2. Arrêter ou réduire la perfusion selon prescription. 3. Préparer le Sulfate de Protamine (antidote). 4. Surveiller les signes de saignement actif (selles, urines, conscience)."
+    },
+    {
+      text: "Femme de 32 ans enceinte à 36 SA, se présente avec céphalées intenses, troubles visuels (points scintillants) et TA à 170/115 mmHg.",
+      sol: "<strong>Diagnostic suspecté :</strong> Prééclampsie sévère (risque d'éclampsie).<br><strong>Actions immédiates :</strong> 1. Environnement calme, peu de stimulation. 2. Surveillance TA et réflexes ostéo-tendineux. 3. Préparer Sulfate de Magnésium sur prescription. 4. Monitorage fœtal continu."
+    },
+    {
+      text: "Patient diabétique de type 1, retrouvé confus, tremblant, en sueurs, glycémie capillaire à 0.38 g/L, mais encore capable de déglutir.",
+      sol: "<strong>Diagnostic suspecté :</strong> Hypoglycémie sévère symptomatique.<br><strong>Actions immédiates :</strong> 1. Resucrage oral immédiat (15g de sucre rapide). 2. Recontrôler la glycémie à 15 min. 3. Si absence d'amélioration ou perte de conscience : Glucagon IM/SC ou Glucosé IV."
+    },
+    {
+      text: "Enfant de 2 ans, fièvre à 39.5°C depuis 6h, convulsions généralisées de 2 minutes observées par les parents, retour à la conscience progressif.",
+      sol: "<strong>Diagnostic suspecté :</strong> Convulsion fébrile.<br><strong>Actions immédiates :</strong> 1. Protéger l'enfant (dégager l'environnement, rien dans la bouche). 2. Position latérale de sécurité en phase post-critique. 3. Chronométrer la crise. 4. Antipyrétique (Paracétamol, jamais Aspirine) et surveillance rapprochée."
+    },
+    {
+      text: "Patient asthmatique connu, crise sévère, ne parvient plus à finir ses phrases, tirage marqué, puis silence complet à l'auscultation pulmonaire.",
+      sol: "<strong>Diagnostic suspecté :</strong> Crise d'asthme aiguë grave — le silence auscultatoire est un signe de GRAVITÉ EXTRÊME (pas une amélioration).<br><strong>Actions immédiates :</strong> 1. Position assise. 2. Bronchodilatateurs en nébulisation (bêta-2 mimétiques + anticholinergique). 3. Corticoïdes systémiques. 4. Alerte immédiate, préparation à une possible intubation."
+    },
+    {
+      text: "Patient présentant une hémiparésie droite brutale et un trouble du langage, apparus il y a 1h30 selon un témoin.",
+      sol: "<strong>Diagnostic suspecté :</strong> AVC (méthode FAST positive).<br><strong>Actions immédiates :</strong> 1. Noter précisément l'heure de début des symptômes. 2. Alerter la filière AVC en urgence. 3. Imagerie cérébrale avant tout traitement. 4. Patient à jeun tant que la déglutition n'est pas évaluée. 5. Glycémie capillaire (éliminer une hypoglycémie qui mime un AVC)."
+    },
+    {
+      text: "Un patient sous chimiothérapie pour un cancer, neutropénique connu, présente une température à 38.4°C sans autre symptôme évident.",
+      sol: "<strong>Diagnostic suspecté :</strong> Neutropénie fébrile — urgence absolue.<br><strong>Actions immédiates :</strong> 1. Prélever des hémocultures. 2. Débuter une antibiothérapie probabiliste à large spectre en urgence (idéalement dans l'heure). 3. Isolement protecteur. 4. Ne jamais faire de toucher rectal ni de température rectale."
+    },
+    {
+      text: "Patiente en post-partum immédiat (1h après accouchement), utérus mou et non rétracté à la palpation, saignement vaginal abondant continu.",
+      sol: "<strong>Diagnostic suspecté :</strong> Hémorragie du post-partum par atonie utérine.<br><strong>Actions immédiates :</strong> 1. Massage utérin manuel immédiat. 2. Administration d'utérotoniques (ocytocine) sur prescription. 3. Voie veineuse de gros calibre, bilan sanguin. 4. Sondage vésical (vessie pleine gêne la rétraction utérine)."
+    },
+    {
+      text: "Patient sous morphine pour douleur post-opératoire, retrouvé très somnolent, fréquence respiratoire à 7/min, pupilles punctiformes.",
+      sol: "<strong>Diagnostic suspecté :</strong> Surdosage aux opioïdes (triade myosis + dépression respiratoire + trouble de conscience).<br><strong>Actions immédiates :</strong> 1. Stimuler le patient, appeler à l'aide. 2. Préparer et administrer la Naloxone sur prescription. 3. Oxygénothérapie. 4. Surveillance prolongée (risque de re-sédation, la Naloxone ayant une durée d'action plus courte que la morphine)."
+    },
+    {
+      text: "Patient plâtré au membre inférieur depuis 24h, se plaint d'une douleur intense disproportionnée non calmée par les antalgiques, avec paresthésies des orteils.",
+      sol: "<strong>Diagnostic suspecté :</strong> Syndrome des loges (compartment syndrome) — urgence chirurgicale.<br><strong>Actions immédiates :</strong> 1. Évaluer la coloration, chaleur, sensibilité et pouls distal. 2. Ne pas surélever excessivement le membre. 3. Alerter le médecin sans délai. 4. Ne jamais banaliser une douleur disproportionnée sous plâtre."
+    },
+    {
+      text: "Patient alcoolique chronique, sevré depuis 36h, présente une confusion, des hallucinations visuelles, une agitation majeure et une fièvre à 38.8°C.",
+      sol: "<strong>Diagnostic suspecté :</strong> Delirium tremens — urgence vitale.<br><strong>Actions immédiates :</strong> 1. Environnement calme et sécurisé, réorientation temporo-spatiale. 2. Benzodiazépines sur prescription. 3. Thiamine (vitamine B1) AVANT tout soluté glucosé. 4. Surveillance rapprochée des paramètres vitaux."
+    },
+    {
+      text: "Enfant de 3 ans, fièvre élevée brutale, hypersialorrhée (bave abondante), position assise penchée en avant bouche ouverte, voix étouffée.",
+      sol: "<strong>Diagnostic suspecté :</strong> Épiglottite aiguë — urgence extrême.<br><strong>Actions immédiates :</strong> 1. Laisser l'enfant dans la position qu'il choisit spontanément. 2. NE JAMAIS examiner la gorge à l'abaisse-langue ni allonger l'enfant. 3. Alerter immédiatement l'équipe médicale (risque d'obstruction complète des voies aériennes)."
+    }
+  ];
+
+  function getRandomCase() {
+    const idx = Math.floor(Math.random() * flashCases.length);
+    const selected = flashCases[idx];
+    document.getElementById('caseBox').innerText = selected.text;
+    document.getElementById('solutionBox').innerHTML = selected.sol;
+    document.getElementById('solutionBox').style.display = 'none';
+    document.getElementById('btnSolution').style.display = 'inline-block';
+  }
+
+  function toggleSolution() {
+    const box = document.getElementById('solutionBox');
+    box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+  }
+
+  // ANALYSEUR BIOLOGIQUE
+  function analyzeLab() {
+    const k = parseFloat(document.getElementById('inputK').value);
+    const na = parseFloat(document.getElementById('inputNa').value);
+    const inr = parseFloat(document.getElementById('inputINR').value);
+    const gly = parseFloat(document.getElementById('inputGly').value);
+    const ca = parseFloat(document.getElementById('inputCa').value);
+    const hb = parseFloat(document.getElementById('inputHb').value);
+    const crea = parseFloat(document.getElementById('inputCrea').value);
+    const plaq = parseFloat(document.getElementById('inputPlaq').value);
+    const crp = parseFloat(document.getElementById('inputCRP').value);
+    const gb = parseFloat(document.getElementById('inputGB').value);
+    const lipase = parseFloat(document.getElementById('inputLipase').value);
+    const spo2 = parseFloat(document.getElementById('inputSpO2').value);
+
+    const container = document.getElementById('labResults');
+    container.innerHTML = "";
+
+    if(k) {
+      if(k > 6.0) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>HYPERKALÉMIE SÉVÈRE (${k} mmol/L) :</strong> Risque d'arythmie cardiaque mortelle ! ECG d'urgence (ondes T pointues, QRS élargi). Préparer Gluconate de Calcium / Insuline-Glucosé / bêta-2 mimétiques.</div>`;
+      else if(k > 5.2) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPERKALÉMIE (${k} mmol/L) :</strong> Surveillance ECG rapprochée, rechercher la cause (insuffisance rénale, médicaments).</div>`;
+      else if(k < 3.5) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPOKALÉMIE (${k} mmol/L) :</strong> Risque de troubles du rythme et crampes. Recharge en Potassium jamais en IV direct — toujours diluée et lente.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Potassium normal (${k} mmol/L).</div>`;
+    }
+
+    if(na) {
+      if(na < 130) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>HYPONATRÉMIE SÉVÈRE (${na} mmol/L) :</strong> Risque neurologique (confusion, convulsions). Correction toujours PROGRESSIVE (risque de myélinolyse centropontine si trop rapide).</div>`;
+      else if(na < 135) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPONATRÉMIE (${na} mmol/L) :</strong> À surveiller, rechercher la cause.</div>`;
+      else if(na > 145) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPERNATRÉMIE (${na} mmol/L) :</strong> Évoque une déshydratation — surveiller l'état de conscience et l'hydratation.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Sodium normal (${na} mmol/L).</div>`;
+    }
+
+    if(inr) {
+      if(inr > 4.5) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>SURDOSAGE EN AVK (INR ${inr}) :</strong> Risque hémorragique majeur. Alerter le médecin, stopper l'AVK, préparer Vitamine K1 ou PPSB (CCP).</div>`;
+      else if(inr >= 2.0 && inr <= 3.0) container.innerHTML += `<div class="result-alert alert-normal">✅ INR Cible sous AVK (${inr}).</div>`;
+      else container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>INR hors cible (${inr}) :</strong> À signaler pour adaptation posologique.</div>`;
+    }
+
+    if(gly) {
+      if(gly < 0.60) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>HYPOGLYCÉMIE SÉVÈRE (${gly} g/L) :</strong> Si consciente : 15g de sucre rapide PO. Si inconsciente : Glucosé 30% IVD ou Glucagon IM/SC.</div>`;
+      else if(gly > 2.5) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>HYPERGLYCÉMIE MAJEURE (${gly} g/L) :</strong> Rechercher une acidocétose (cétonémie, gaz du sang). Surveillance kaliémie si insulinothérapie IV débutée.</div>`;
+      else if(gly > 1.10) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPERGLYCÉMIE (${gly} g/L) :</strong> À surveiller et signaler.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Glycémie normale (${gly} g/L).</div>`;
+    }
+
+    if(ca) {
+      if(ca < 2.0) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>HYPOCALCÉMIE SÉVÈRE (${ca} mmol/L) :</strong> Risque de tétanie, convulsions. Surveiller signe de Chvostek/Trousseau. Préparer Gluconate de Calcium sur prescription.</div>`;
+      else if(ca < 2.2) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPOCALCÉMIE (${ca} mmol/L) :</strong> À surveiller.</div>`;
+      else if(ca > 2.6) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>HYPERCALCÉMIE (${ca} mmol/L) :</strong> Surveiller troubles digestifs, confusion, hydratation.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Calcémie normale (${ca} mmol/L).</div>`;
+    }
+
+    if(hb) {
+      if(hb < 8) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>ANÉMIE SÉVÈRE (${hb} g/dL) :</strong> Surveiller signes de mauvaise tolérance (tachycardie, dyspnée, pâleur). Préparer une transfusion possible sur prescription — contrôle ultime ABO obligatoire au lit.</div>`;
+      else if(hb < 12) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>ANÉMIE (${hb} g/dL) :</strong> Rechercher la cause (carence, saignement, hémolyse).</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Hémoglobine normale (${hb} g/dL).</div>`;
+    }
+
+    if(crea) {
+      if(crea > 200) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>INSUFFISANCE RÉNALE MARQUÉE (créatinine ${crea} µmol/L) :</strong> Surveiller diurèse, kaliémie, adapter les posologies des médicaments à élimination rénale.</div>`;
+      else if(crea > 90) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>Créatinine élevée (${crea} µmol/L) :</strong> À surveiller, évaluer la fonction rénale.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Créatininémie normale (${crea} µmol/L).</div>`;
+    }
+
+    if(plaq) {
+      if(plaq < 50) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>THROMBOPÉNIE SÉVÈRE (${plaq} x10⁹/L) :</strong> Risque hémorragique majeur. Éviter les injections IM, surveiller signes de saignement (pétéchies, gencives).</div>`;
+      else if(plaq < 150) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>THROMBOPÉNIE (${plaq} x10⁹/L) :</strong> À surveiller.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Plaquettes normales (${plaq} x10⁹/L).</div>`;
+    }
+
+    if(crp) {
+      if(crp > 100) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>CRP TRÈS ÉLEVÉE (${crp} mg/L) :</strong> Fort syndrome inflammatoire/infectieux — rechercher un foyer, surveiller la fièvre et les paramètres hémodynamiques.</div>`;
+      else if(crp > 5) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>CRP élevée (${crp} mg/L) :</strong> Syndrome inflammatoire à explorer.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ CRP normale (${crp} mg/L).</div>`;
+    }
+
+    if(gb) {
+      if(gb < 0.5) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>NEUTROPÉNIE SÉVÈRE (leucocytes ${gb} x10⁹/L) :</strong> Toute fièvre associée est une urgence absolue. Isolement protecteur, hémocultures puis antibiothérapie en urgence.</div>`;
+      else if(gb < 4) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>Leucopénie (${gb} x10⁹/L) :</strong> Surveillance rapprochée du risque infectieux.</div>`;
+      else if(gb > 10) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>Hyperleucocytose (${gb} x10⁹/L) :</strong> Rechercher un syndrome infectieux ou inflammatoire.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Leucocytes normaux (${gb} x10⁹/L).</div>`;
+    }
+
+    if(lipase) {
+      if(lipase > 180) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>LIPASÉMIE TRÈS ÉLEVÉE (${lipase} U/L, >3x la normale) :</strong> Évocateur de pancréatite aiguë. Mise à jeun stricte, réhydratation IV, antalgie sur prescription.</div>`;
+      else if(lipase > 60) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>Lipasémie élevée (${lipase} U/L) :</strong> À corréler à la clinique.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Lipasémie normale (${lipase} U/L).</div>`;
+    }
+
+    if(spo2) {
+      if(spo2 < 90) container.innerHTML += `<div class="result-alert alert-danger">🚨 <strong>DÉSATURATION SÉVÈRE (SpO2 ${spo2}%) :</strong> Oxygénothérapie urgente sur prescription, position demi-assise, alerte médicale.</div>`;
+      else if(spo2 < 95) container.innerHTML += `<div class="result-alert alert-warning">⚠️ <strong>SpO2 basse (${spo2}%) :</strong> Surveillance rapprochée, réévaluer la cause.</div>`;
+      else container.innerHTML += `<div class="result-alert alert-normal">✅ Saturation normale (${spo2}%).</div>`;
+    }
+
+    if(container.innerHTML === "") {
+      container.innerHTML = `<p style="color:#94a3b8; font-style:italic;">Saisissez une ou plusieurs valeurs ci-dessus pour obtenir une analyse.</p>`;
+    }
+  }
+</script>
+
+</body>
+</html>
